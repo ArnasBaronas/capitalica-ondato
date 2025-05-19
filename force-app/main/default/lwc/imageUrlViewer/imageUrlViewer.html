@@ -1,22 +1,26 @@
 <template>
-    <!-- TODO: add no image placeholder -->
     <!-- TODO: add component icon -->
-    <!-- TODO: optimize code -->
     <lightning-card title={cardLabel} icon-name={cardIcon}>
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading..." size="small"></lightning-spinner>
+        </template>
+
         <template if:true={imageUrl}>
-            <div class="slds-align_absolute-center">
-                <div class="slds-p-around_medium">
-                    <img src={imageUrl} alt="Record Image"/>
-                </div>
+            <div class="slds-align_absolute-center slds-p-around_medium">
+                <img src={imageUrl} alt={cardLabel} onerror={handleImageError}/>
+            </div>
+        </template>
+
+        <template if:true={showPlaceholder}>
+            <div class="slds-align_absolute-center slds-m-around_xx-large">
+                <img src="/img/chatter/OpenRoad.svg" class="slds-illustration__svg"
+                     alt="Company Data"/>
             </div>
         </template>
         <template if:true={error}>
             <div class="slds-m-horizontal_small">
-            <p class="slds-text-color_error">Error: {error}</p>
+                <p class="slds-text-color_error">Error: {error}</p>
             </div>
-        </template>
-        <template if:true={isLoading}>
-            <lightning-spinner alternative-text="Loading..." size="small"></lightning-spinner>
         </template>
     </lightning-card>
 </template>

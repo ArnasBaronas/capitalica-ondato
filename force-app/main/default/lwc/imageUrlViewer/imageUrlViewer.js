@@ -1,21 +1,26 @@
-import {LightningElement, api, wire} from 'lwc';
-import {getRecord} from 'lightning/uiRecordApi';
-import {getObjectInfo} from "lightning/uiObjectInfoApi";
+import { LightningElement, api, wire } from 'lwc';
+import { getRecord } from 'lightning/uiRecordApi';
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 
 export default class ImageUrlViewer extends LightningElement {
-
     @api recordId;
     @api objectApiName;
-    @api cardIcon;
     @api fieldName;
+    @api cardIcon;
 
-    cardLabel;
     imageUrl;
+    cardLabel;
     error;
-    fieldValueLoaded = false;
+
+    imageLoaded = false;
+    labelLoaded = false;
 
     get isLoading() {
-        return !(this.cardLabel && this.fieldValueLoaded);
+        return !(this.imageLoaded && this.labelLoaded);
+    }
+
+    get showPlaceholder() {
+        return !this.imageUrl && !this.isLoading && !this.error;
     }
 
     get imageUrlField() {
@@ -26,40 +31,35 @@ export default class ImageUrlViewer extends LightningElement {
         return [this.imageUrlField];
     }
 
-    @wire(getRecord, {
-        recordId: '$recordId',
-        fields: '$fieldsToQuery'
-    })
-    wiredRecord({error, data}) {
-        if (!this.fieldsToQuery) {
-            return;
-        }
-        if (data) {
+    @wire(getRecord, { recordId: '$recordId', fields: '$fieldsToQuery' })
+    wiredRecord({ error, data }) {
+        this.imageLoaded = true;
+        if (error) {
+            this.error = error.body?.message || 'Unable to load image field.';
+        } else if (data) {
             try {
-                this.imageUrl = data.fields[this.fieldName]?.value;
-                if (!this.imageUrl) {
-                    this.error = `Field "${this.fieldName}" is empty or not found.`;
-                }
+                const fieldData = data.fields?.[this.fieldName];
+                this.imageUrl = fieldData?.value || null;
             } catch (e) {
-                this.error = `Unable to read field "${this.fieldName}"`;
+                this.error = `Error accessing field "${this.fieldName}"`;
             }
-        } else if (error) {
-            this.error = error.body?.message || 'Unknown error';
         }
-        this.fieldValueLoaded = true;
     }
 
-    @wire(getObjectInfo, {
-        objectApiName: '$objectApiName'
-    })
-    objectInfo({error, data}) {
+    @wire(getObjectInfo, { objectApiName: '$objectApiName' })
+    wiredObjectInfo({ error, data }) {
+        this.labelLoaded = true;
         if (data) {
-            const fieldInfo = data.fields[this.fieldName];
+            const fieldInfo = data.fields?.[this.fieldName];
             if (fieldInfo) {
                 this.cardLabel = fieldInfo.label;
             }
         } else if (error) {
-            console.error('Error loading object info', error);
+            console.error('Object info error:', error);
         }
+    }
+
+    handleImageError() {
+        this.imageUrl = null;
     }
 }
