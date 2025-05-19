@@ -1,43 +1,57 @@
 <template>
     <lightning-quick-action-panel header="Create AML Match Review">
-        <lightning-radio-group label="Match Status"
-                               name="status"
-                               options={matchStatusOptions}
-                               value={amlMatchReview.status}
-                               onchange={handleChange}
-                               required="true"
-                               type="radio"></lightning-radio-group>
-        <lightning-input required="true"
-                         onchange={handleChange}
-                         name="clientRiskRating"
-                         type="text"
-                         label="Client Risk Rating"
-                         value={amlMatchReview.clientRiskRating}></lightning-input>
-        <lightning-textarea required="true"
-                            name="clientComment"
-                            onchange={handleChange}
-                            label="Comment"
-                            value={amlMatchReview.clientComment}></lightning-textarea>
-        <lightning-input type="text"
-                         name="clientUserId"
-                         label="Reviewed By"
-                         disabled="true"
-                         value={amlMatchReview.clientUserId}></lightning-input>
-        <div slot="footer">
-            <div class="slds-align_absolute-center">
-                <div class="slds-m-horizontal_medium">
-                    <lightning-button icon-name="utility:send"
-                                      label="Create Review"
-                                      variant="brand"
-                                      onclick={createReview}
-                                      disabled={isSubmitDisabled}></lightning-button>
-                </div>
-                <div class="slds-m-horizontal_medium">
-                    <lightning-button icon-name="utility:close"
-                                      label="Cancel"
-                                      variant="neutral"
-                                      onclick={closeForm}></lightning-button>
-                </div>
+        <lightning-radio-group
+                label="Match Status"
+                name="status"
+                options={matchStatusOptions}
+                value={amlMatchReview.status}
+                onchange={handleChange}
+                required
+                type="radio">
+        </lightning-radio-group>
+
+        <lightning-input
+                label="Client Risk Rating"
+                name="clientRiskRating"
+                type="text"
+                value={amlMatchReview.clientRiskRating}
+                onchange={handleChange}
+                required>
+        </lightning-input>
+
+        <lightning-textarea
+                label="Comment"
+                name="clientComment"
+                value={amlMatchReview.clientComment}
+                onchange={handleChange}
+                required>
+        </lightning-textarea>
+
+        <lightning-input
+                label="Reviewed By"
+                name="clientUserId"
+                value={amlMatchReview.clientUserId}
+                disabled
+                type="text">
+        </lightning-input>
+
+        <div slot="footer" class="slds-align_absolute-center">
+            <div class="slds-m-horizontal_medium">
+                <lightning-button
+                        icon-name="utility:send"
+                        label="Create Review"
+                        variant="brand"
+                        onclick={createReview}
+                        disabled={isSubmitDisabled}>
+                </lightning-button>
+            </div>
+            <div class="slds-m-horizontal_medium">
+                <lightning-button
+                        icon-name="utility:close"
+                        label="Cancel"
+                        variant="neutral"
+                        onclick={closeForm}>
+                </lightning-button>
             </div>
         </div>
     </lightning-quick-action-panel>

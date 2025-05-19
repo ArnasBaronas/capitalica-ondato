@@ -1,43 +1,39 @@
+import { LightningElement, api, track, wire } from 'lwc';
+import { getRecord, updateRecord } from 'lightning/uiRecordApi';
+import { getPicklistValues, getObjectInfo } from 'lightning/uiObjectInfoApi';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { CloseActionScreenEvent } from 'lightning/actions';
+import { reduceErrors } from 'c/ldsUtils';
 import sendMatchReview from '@salesforce/apex/OndatoService.sendMatchReview';
 
-import {reduceErrors} from 'c/ldsUtils';
-import {getPicklistValues, getObjectInfo} from "lightning/uiObjectInfoApi";
-import {getRecord, updateRecord} from 'lightning/uiRecordApi';
-import {ShowToastEvent} from "lightning/platformShowToastEvent";
-import {CloseActionScreenEvent} from 'lightning/actions';
-import {api, LightningElement, track, wire} from 'lwc';
-
 import USER_ID from '@salesforce/user/Id';
-
 import USER_NAME_FIELD from '@salesforce/schema/User.Name';
 import USER_EMAIL_FIELD from '@salesforce/schema/User.Email';
 import AML_MATCH_OBJECT from '@salesforce/schema/AML_Match__c';
 import AML_MATCH_STATUS_FIELD from '@salesforce/schema/AML_Match__c.Status__c';
 import AML_MATCH_SCORE_FIELD from '@salesforce/schema/AML_Match__c.Score__c';
 
-const USER_FIELDS_TO_QUERY = [USER_NAME_FIELD, USER_EMAIL_FIELD];
-const AML_MATCH_FIELDS_TO_QUERY = [AML_MATCH_STATUS_FIELD, AML_MATCH_SCORE_FIELD];
+const USER_FIELDS = [USER_NAME_FIELD, USER_EMAIL_FIELD];
+const AML_MATCH_FIELDS = [AML_MATCH_STATUS_FIELD, AML_MATCH_SCORE_FIELD];
 
 export default class AmlMatchReviewCreateForm extends LightningElement {
-
-    @api
-    recordId;
-    @api
-    objectApiName;
+    @api recordId;
+    @api objectApiName;
 
     @track amlMatchReview = {
-        status: undefined,
-        clientRiskRating: undefined,
-        clientComment: undefined,
-        clientUserId: undefined
+        status: '',
+        clientRiskRating: '',
+        clientComment: '',
+        clientUserId: ''
     };
 
-    amlMatchScore;
+    @track matchStatusOptions = [];
 
+    amlMatchScore;
     isSubmitDisabled = true;
 
-    @wire(getRecord, {recordId: USER_ID, fields: USER_FIELDS_TO_QUERY})
-    wiredUser({error, data}) {
+    @wire(getRecord, { recordId: USER_ID, fields: USER_FIELDS })
+    handleUser({ data, error }) {
         if (data) {
             this.amlMatchReview.clientUserId = data.fields.Email.value;
         } else if (error) {
@@ -45,12 +41,11 @@ export default class AmlMatchReviewCreateForm extends LightningElement {
         }
     }
 
-    @wire(getRecord, {recordId: '$recordId', fields: AML_MATCH_FIELDS_TO_QUERY})
-    wiredAmlMatch({error, data}) {
+    @wire(getRecord, { recordId: '$recordId', fields: AML_MATCH_FIELDS })
+    handleAmlMatch({ data, error }) {
         if (data) {
             this.amlMatchReview.status = data.fields.Status__c.value;
             this.amlMatchScore = data.fields.Score__c.value;
-
         } else if (error) {
             console.error('Error fetching AML match:', error);
         }
@@ -63,95 +58,56 @@ export default class AmlMatchReviewCreateForm extends LightningElement {
         recordTypeId: '$objectInfo.data.defaultRecordTypeId',
         fieldApiName: AML_MATCH_STATUS_FIELD
     })
-    wiredPicklistValues({ error, data }) {
+    handlePicklist({ data, error }) {
         if (data) {
-            this.matchStatusOptions = data.values.map(item => ({
-                label: item.label,
-                value: item.value
-            }));
-            console.log(this.amlMatchScore)
-            if(this.amlMatchScore !== 0) {
-                this.matchStatusOptions = this.matchStatusOptions.filter(function( obj ) {
-                    return obj.value !== 'Discarded';
-                });
-                console.log(JSON.stringify(this.matchStatusOptions));
+            let options = data.values.map(({ label, value }) => ({ label, value }));
+            if (this.amlMatchScore !== 0) {
+                options = options.filter(opt => opt.value !== 'Discarded');
             }
+            this.matchStatusOptions = options;
         } else if (error) {
             console.error('Error loading picklist values', error);
         }
     }
 
-    @track
-    matchStatusOptions = [];
-
     handleChange(event) {
-        const field = event.target.name || 'status';
-        const value = event.detail.value || event.target.value;
-
-        this.amlMatchReview = {
-            ...this.amlMatchReview,
-            [field]: value
-        };
-
+        const { name, value } = event.target;
+        this.amlMatchReview = { ...this.amlMatchReview, [name]: value };
         this.validateForm();
     }
 
     validateForm() {
-        this.isSubmitDisabled = Object.values(this.amlMatchReview).some(
-            value => value === null || value === undefined || value === ''
-        );
+        const { status, clientRiskRating, clientComment, clientUserId } = this.amlMatchReview;
+        this.isSubmitDisabled = !status || !clientRiskRating || !clientComment || !clientUserId;
     }
 
     createReview() {
+        this.isSubmitDisabled = true;
         sendMatchReview({
             amlMatchId: this.recordId,
             amlMatchReviewMap: this.amlMatchReview,
             performDML: false
-        }).then(matchStatus => {
-            this.dispatchEvent(new ShowToastEvent({
-                title: 'Success',
-                message: 'Review created successfully',
-                variant: 'success'
-            }));
-            let fields = {
-                Id: this.recordId,
-                Status__c: matchStatus
-            };
-            let recordToUpdate = {fields: fields}
-            updateRecord(recordToUpdate)
-                .then(() => {
-                    this.dispatchEvent(
-                        new ShowToastEvent({
-                            title: "Success",
-                            message: "Match successfully updated.",
-                            variant: "success",
-                        }),
-                    );
-                    this.dispatchEvent(new CloseActionScreenEvent());
-                })
-                .catch((error) => {
-                    console.error(error);
-                    this.dispatchEvent(
-                        new ShowToastEvent({
-                            title: "Error updating AML match",
-                            message: error.body.message,
-                            variant: "error",
-                        }),
-                    );
+        })
+            .then(matchStatus => {
+                this.showToast('Success', 'Review created successfully', 'success');
+                return updateRecord({
+                    fields: { Id: this.recordId, Status__c: matchStatus }
                 });
-        }).catch(error => {
-            console.error(error);
-            this.dispatchEvent(new ShowToastEvent({
-                title: 'Error',
-                message: reduceErrors(error).join(', '),
-                variant: 'error'
-            }));
-        }).finally(() => {
-            this.dispatchEvent(new CloseActionScreenEvent());
-        });
+            })
+            .then(() => {
+                this.closeForm();
+            })
+            .catch(error => {
+                this.showToast('Error', reduceErrors(error).join(', '), 'error');
+                console.error(error);
+            });
     }
 
     closeForm() {
         this.dispatchEvent(new CloseActionScreenEvent());
+    }
+
+    showToast(title, message, variant) {
+        this.dispatchEvent(new ShowToastEvent({ title, message, variant }));
     }
 }
