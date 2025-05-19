@@ -1,0 +1,31 @@
+<template>
+    <lightning-quick-action-panel header="Create AML Match Review">
+
+        <lightning-radio-group label="Match Status"
+                               options={matchStatuses}
+                               value={amlMatchReview.status}
+                               required="true"
+                               type="radio"></lightning-radio-group>
+        <lightning-input required="true" type="text" label="Client Risk Rating" value={amlMatchReview.clientRiskRating}></lightning-input>
+        <lightning-textarea required="true" label="Comment" value={amlMatchReview.clientComment}></lightning-textarea>
+        <lightning-input required="true" type="text" label="Reviewed By" disabled="true"
+                         value={amlMatchReview.clientUserId}></lightning-input>
+
+        <div slot="footer">
+            <div class="slds-align_absolute-center">
+                <div class="slds-m-horizontal_medium">
+                    <lightning-button icon-name="utility:send"
+                                      label="Create Review"
+                                      variant="brand"
+                                      onclick={createReview}></lightning-button>
+                </div>
+                <div class="slds-m-horizontal_medium">
+                    <lightning-button icon-name="utility:close"
+                                      label="Cancel"
+                                      variant="neutral"
+                                      onclick={closeForm}></lightning-button>
+                </div>
+            </div>
+        </div>
+    </lightning-quick-action-panel>
+</template>
