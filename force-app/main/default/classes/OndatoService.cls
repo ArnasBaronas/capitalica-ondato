@@ -156,7 +156,9 @@ public with sharing class OndatoService {
 
 		Exception caughtException;
 		HttpRequest request = new HttpRequest();
+		HttpResponse response;
 		AML_Match__c amlMatch;
+
 		try {
 			amlMatch = [
 					SELECT
@@ -184,45 +186,42 @@ public with sharing class OndatoService {
 			Logger.info(request.getEndpoint());
 			Logger.info('Request body');
 			Logger.info(request.getBody());
-		} catch (Exception exc) {
-			Logger.error('Error preparing HTTP request', exc);
-			Logger.saveLog();
-			throw caughtException;
-		}
 
-		HttpResponse response;
-		try {
 			response = new Http().send(request);
 			if (String.valueOf(response.getStatusCode()).startsWith('2') == false) {
 				throw new CalloutException('HTTP - ' + response.getStatusCode() + '. Response: ' + response.getBody());
 			}
 		} catch (Exception exc) {
 			caughtException = exc;
-			Logger.info('Response status code');
-			Logger.info(String.valueOf(response.getStatusCode()));
-			Logger.info('Response body');
-			Logger.info(response?.getBody());
-			Logger.error('Error during or processing callout', exc);
-		}
 
-		if (performDML && caughtException == null) {
-			try {
-				Database.update(new AML_Match__c(
-						Id = amlMatchId,
-						Status__c = matchReview.status
-				));
-			} catch (Exception exc) {
-				caughtException = exc;
-				Logger.error('Error during AML match update', exc);
+			if (response != null) {
+				Logger.info('Response status code');
+				Logger.info(String.valueOf(response.getStatusCode()));
+				Logger.info('Response body');
+				Logger.info(response?.getBody());
+				Logger.error('Error preparing or executing callout', exc);
 			}
-		}
-		if (caughtException != null) {
+
 			Logger.saveLog();
 			throw caughtException;
 		}
-		else {
-			Logger.flushBuffer();
+
+		if (performDML) {
+			try {
+				update new AML_Match__c(
+						Id = amlMatchId,
+						Status__c = matchReview.status
+				);
+			} catch (Exception ex) {
+				caughtException = ex;
+				Logger.error('Failed to update AML_Match__c with review status', ex);
+				Logger.saveLog();
+				throw caughtException;
+			}
 		}
+
+		Logger.flushBuffer();
+
 		return matchReview.status;
 	}
 }
