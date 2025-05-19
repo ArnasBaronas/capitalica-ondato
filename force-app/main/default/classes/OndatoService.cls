@@ -150,56 +150,79 @@ public with sharing class OndatoService {
 	}
 
 	@AuraEnabled(Cacheable=false)
-	public static String sendMatchReview(Id amlMatchId, Object amlMatchReviewMap) {
+	public static String sendMatchReview(Id amlMatchId, Object amlMatchReviewMap, Boolean performDML) {
+		//TODO: Accept AmlMatchReviewModel as parameter.
 		AmlMatchReviewModel matchReview = (AmlMatchReviewModel) JSON.deserialize(JSON.serialize(amlMatchReviewMap), AmlMatchReviewModel.class);
-		Logger.info(JSON.serialize(matchReview));
-		Boolean exceptionThrown = false;
-		AML_Match__c amlMatch = [
-				SELECT
-						Id, Match_ID__c,
-						Account__r.Id, Account__r.IsPersonAccount, Account__r.Ondato_Id__c
-				FROM AML_Match__c
-				WHERE Id = :amlMatchId
-				WITH SECURITY_ENFORCED
-		];
+
+		Exception caughtException;
 		HttpRequest request = new HttpRequest();
-		request.setEndpoint('callout:Ondato/v1/worklists/' + worklistId + getEntityPath(amlMatch.Account__r) + amlMatch.Account__r.Ondato_Id__c + '/matches/' + amlMatch.Match_ID__c + '/reviews');
-		request.setMethod('POST');
-		Logger.info('Sending "' + amlMatch.Match_ID__c + '" AML match review in Ondato', amlMatchId);
+		AML_Match__c amlMatch;
+		try {
+			amlMatch = [
+					SELECT
+							Id, Match_ID__c,
+							Account__r.Id, Account__r.IsPersonAccount, Account__r.Ondato_Id__c
+					FROM AML_Match__c
+					WHERE Id = :amlMatchId
+					WITH SECURITY_ENFORCED
+			];
+			Logger.info('Sending "' + amlMatch.Match_ID__c + '" AML match review in Ondato', amlMatchId);
 
-		request.setBody(JSON.serialize(matchReview, true));
-		request.setHeader('Content-Type', 'application/json');
+			request.setMethod('POST');
+			request.setHeader('Content-Type', 'application/json');
+			request.setBody(JSON.serialize(matchReview, true));
 
-		Logger.info('Request endpoint');
-		Logger.info(request.getEndpoint());
-		Logger.info('Request body');
-		Logger.info(request.getBody());
+			{
+				String endpoint = 'callout:Ondato/v1/worklists/' + worklistId;
+				endpoint += OndatoServiceUtility.getEntityPath(amlMatch.Account__r);
+				endpoint += amlMatch.Account__r.Ondato_Id__c + '/matches/';
+				endpoint += amlMatch.Match_ID__c + '/reviews';
+				request.setEndpoint(endpoint);
+			}
+
+			Logger.info('Request endpoint');
+			Logger.info(request.getEndpoint());
+			Logger.info('Request body');
+			Logger.info(request.getBody());
+		} catch (Exception exc) {
+			Logger.error('Error preparing HTTP request', exc);
+			Logger.saveLog();
+			throw caughtException;
+		}
+
 		HttpResponse response;
 		try {
 			response = new Http().send(request);
 			if (String.valueOf(response.getStatusCode()).startsWith('2') == false) {
 				throw new CalloutException('HTTP - ' + response.getStatusCode() + '. Response: ' + response.getBody());
 			}
-			Logger.flushBuffer();
 		} catch (Exception exc) {
-			exceptionThrown = true;
+			caughtException = exc;
 			Logger.info('Response status code');
 			Logger.info(String.valueOf(response.getStatusCode()));
 			Logger.info('Response body');
 			Logger.info(response?.getBody());
 			Logger.error('Error during or processing callout', exc);
 		}
-		if (exceptionThrown) {
-			Logger.saveLog();
-		}
-		Database.update(new AML_Match__c(Id = amlMatchId, Status__c = matchReview.status));
-		return matchReview.status;
-	}
 
-	static String getEntityPath(Account account) {
-		if (account.IsPersonAccount) {
-			return '/natural-entity-records/';
+		if (performDML && caughtException == null) {
+			try {
+				Database.update(new AML_Match__c(
+						Id = amlMatchId,
+						Status__c = matchReview.status
+				));
+			} catch (Exception exc) {
+				caughtException = exc;
+				Logger.error('Error during AML match update', exc);
+			}
 		}
-		return '/legal-entity-records/';
+		if (caughtException != null) {
+			Logger.saveLog();
+			throw caughtException;
+		}
+		else {
+			Logger.flushBuffer();
+		}
+		return matchReview.status;
 	}
 }
