@@ -51,39 +51,52 @@ public with sharing class OndatoService {
 	}
 
 	public static AccountTransferResult sendPersonAccount(Account account, Boolean performDML, Boolean throwException) {
+		Exception caughtException;
 		HttpRequest request = new HttpRequest();
-		request.setEndpoint('callout:Ondato/v1/worklists/' + worklistId + '/natural-entity-records');
-		if (account.Ondato_Id__c == null) {
-			request.setMethod('POST');
-		} else {
-			request.setMethod('PUT');
-			request.setEndpoint(request.getEndpoint() + '/' + account.Ondato_Id__c);
-		}
+		HttpResponse response;
 
-		request.setHeader('Content-Type', 'application/json');
-		String requestBody;
-		Logger.info('Creating person account "' + account.Name + '" in Ondato', account.Id);
 		try {
-			requestBody = JSON.serialize(new OndatoNaturalEntityModel(account));
+			Logger.info('Creating person account "' + account.Name + '" in Ondato', account.Id);
+			request.setEndpoint('callout:Ondato/v1/worklists/' + worklistId + OndatoServiceUtility.getEntityPath(account));
+			if (account.Ondato_Id__c == null) {
+				request.setMethod('POST');
+			} else {
+				request.setMethod('PUT');
+				request.setEndpoint(request.getEndpoint() + account.Ondato_Id__c);
+			}
+			request.setHeader('Content-Type', 'application/json');
+
+			String requestBody;
+			if (account.IsPersonAccount) {
+				requestBody = JSON.serialize(new OndatoNaturalEntityModel(account));
+			} else {
+				requestBody = JSON.serialize(new OndatoLegalEntityModel(account));
+			}
 			request.setBody(requestBody);
-			HttpResponse response = new Http().send(request);
+			Logger.info('Request endpoint');
+			Logger.info(request.getEndpoint());
+			Logger.info('Request body');
+			Logger.info(requestBody);
+
+			response = new Http().send(request);
 			if (request.getMethod() == 'POST') {
 				account.Ondato_Id__c = String.valueOf(((Map<String, Object>) JSON.deserializeUntyped(response.getBody())).get('id'));
 			}
 			account.Last_Exported_to_Ondato__c = Datetime.now();
 			Logger.flushBuffer();
 		} catch (Exception exc) {
-			Logger.info('Request endpoint');
-			Logger.info(request.getEndpoint());
-			Logger.info('Request body');
-			Logger.info(requestBody);
-			Logger.error('Error during callout', exc);
+			Logger.error('Error executing or processing callout', exc);
+			caughtException = exc;
 		}
 		if (performDML) {
 			Logger.saveLog();
-			//TODO: change into user mode
 			Database.update(account, AccessLevel.SYSTEM_MODE);
 		}
+
+		if (throwException && caughtException != null) {
+			throw caughtException;
+		}
+
 
 		AccountTransferResult result = new AccountTransferResult();
 		result.ondatoId = account.Ondato_Id__c;
@@ -93,11 +106,7 @@ public with sharing class OndatoService {
 		return result;
 	}
 
-	public static Boolean deletePersonAccount(Account account, Boolean performDML, Boolean throwException) {
-		return true;
-	}
-
-	public static Boolean deleteBusinessAccount(Account account, Boolean performDML, Boolean throwException) {
+	public static Boolean deleteAccount(Account account, Boolean performDML, Boolean throwException) {
 		return true;
 	}
 
@@ -143,10 +152,6 @@ public with sharing class OndatoService {
 			Database.upsert(matchRecords, AML_Match__c.Match_ID__c);
 		}
 		return matchRecords;
-	}
-
-	public static List<AML_Match__c> getBusinessAccountMatches(Account account, Boolean performDML, Boolean throwException) {
-		return null;
 	}
 
 	@AuraEnabled(Cacheable=false)
@@ -219,9 +224,7 @@ public with sharing class OndatoService {
 				throw caughtException;
 			}
 		}
-
 		Logger.flushBuffer();
-
 		return matchReview.status;
 	}
 }
