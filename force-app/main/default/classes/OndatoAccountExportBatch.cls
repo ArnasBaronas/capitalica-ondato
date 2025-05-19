@@ -82,14 +82,7 @@ public with sharing class OndatoAccountExportBatch implements Schedulable, Datab
 		];
 
 		for (Account account : accounts) {
-			OndatoService.AccountTransferResult transferResult;
-
-			if (account.IsPersonAccount) {
-				transferResult = OndatoService.sendPersonAccount(account, false, false);
-			} else {
-				transferResult = OndatoService.sendBusinessAccount(account, false, false);
-			}
-
+			OndatoService.AccountTransferResult transferResult = OndatoService.sendAccount(account, false, false);
 			account.Ondato_Id__c = transferResult.ondatoId;
 			account.Last_Exported_to_Ondato__c = transferResult.exportDateTime;
 			accountsToUpdate.add(account);

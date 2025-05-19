@@ -8,101 +8,72 @@ public with sharing class OndatoService {
 		public Boolean isSuccessful;
 	}
 
-	public static AccountTransferResult sendBusinessAccount(Account account, Boolean performDML, Boolean throwException) {
-		HttpRequest request = new HttpRequest();
-		request.setEndpoint('callout:Ondato/v1/worklists/' + worklistId + '/legal-entity-records');
-		if (account.Ondato_Id__c == null) {
-			request.setMethod('POST');
-		} else {
-			request.setMethod('PUT');
-			request.setEndpoint(request.getEndpoint() + '/' + account.Ondato_Id__c);
-		}
-		request.setHeader('Content-Type', 'application/json');
-		String requestBody;
-		Logger.info('Creating person account "' + account.Name + '" in Ondato', account.Id);
-		try {
-			requestBody = JSON.serialize(new OndatoLegalEntityModel(account));
-			request.setBody(requestBody);
-			HttpResponse response = new Http().send(request);
-			if (request.getMethod() == 'POST') {
-				account.Ondato_Id__c = String.valueOf(((Map<String, Object>) JSON.deserializeUntyped(response.getBody())).get('id'));
-			}
-			account.Last_Exported_to_Ondato__c = Datetime.now();
-			Logger.flushBuffer();
-		} catch (Exception exc) {
-			Logger.info('Request endpoint');
-			Logger.info(request.getEndpoint());
-			Logger.info('Request body');
-			Logger.info(requestBody);
-			Logger.error('Error during callout', exc);
-		}
-		if (performDML) {
-			Logger.saveLog();
-			//TODO: change into user mode
-			Database.update(account, AccessLevel.SYSTEM_MODE);
-		}
-
+	public static AccountTransferResult sendAccount(Account account, Boolean performDML, Boolean throwException) {
 		AccountTransferResult result = new AccountTransferResult();
-		result.ondatoId = account.Ondato_Id__c;
-		result.exportDateTime = account.Last_Exported_to_Ondato__c;
-		result.isSuccessful = true;
-
-		return result;
-	}
-
-	public static AccountTransferResult sendPersonAccount(Account account, Boolean performDML, Boolean throwException) {
-		Exception caughtException;
 		HttpRequest request = new HttpRequest();
 		HttpResponse response;
+		Exception caughtException;
 
 		try {
-			Logger.info('Creating person account "' + account.Name + '" in Ondato', account.Id);
-			request.setEndpoint('callout:Ondato/v1/worklists/' + worklistId + OndatoServiceUtility.getEntityPath(account));
-			if (account.Ondato_Id__c == null) {
+			Logger.info('Sending "' + account.Name + '" account to Ondato', account.Id);
+
+			String baseEndpoint = 'callout:Ondato/v1/worklists/' + worklistId + OndatoServiceUtility.getEntityPath(account);
+			Boolean isNew = String.isBlank(account.Ondato_Id__c);
+
+			if (isNew) {
 				request.setMethod('POST');
+				request.setEndpoint(baseEndpoint);
 			} else {
 				request.setMethod('PUT');
-				request.setEndpoint(request.getEndpoint() + account.Ondato_Id__c);
+				request.setEndpoint(baseEndpoint + account.Ondato_Id__c);
 			}
+
 			request.setHeader('Content-Type', 'application/json');
 
-			String requestBody;
-			if (account.IsPersonAccount) {
-				requestBody = JSON.serialize(new OndatoNaturalEntityModel(account));
-			} else {
-				requestBody = JSON.serialize(new OndatoLegalEntityModel(account));
-			}
-			request.setBody(requestBody);
-			Logger.info('Request endpoint');
-			Logger.info(request.getEndpoint());
-			Logger.info('Request body');
-			Logger.info(requestBody);
+			String requestBody = account.IsPersonAccount
+					? JSON.serialize(new OndatoNaturalEntityModel(account))
+					: JSON.serialize(new OndatoLegalEntityModel(account));
 
+			request.setBody(requestBody);
+
+			Logger.info('Request endpoint: ' + request.getEndpoint());
+			Logger.info('Request body: ' + requestBody);
+
+			//TODO: validate status code
 			response = new Http().send(request);
-			if (request.getMethod() == 'POST') {
-				account.Ondato_Id__c = String.valueOf(((Map<String, Object>) JSON.deserializeUntyped(response.getBody())).get('id'));
+
+			if (isNew) {
+				Map<String, Object> responseMap = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
+				Object idValue = responseMap.get('id');
+				if (idValue != null) {
+					account.Ondato_Id__c = String.valueOf(idValue);
+				} else {
+					throw new CalloutException('Missing "id" in response when creating account on Ondato');
+				}
 			}
+
 			account.Last_Exported_to_Ondato__c = Datetime.now();
+			result.isSuccessful = true;
+
+			if (performDML) {
+				Database.update(account, AccessLevel.SYSTEM_MODE);
+			}
 			Logger.flushBuffer();
 		} catch (Exception exc) {
-			Logger.error('Error executing or processing callout', exc);
 			caughtException = exc;
-		}
-		if (performDML) {
-			Logger.saveLog();
-			Database.update(account, AccessLevel.SYSTEM_MODE);
+			Logger.error('Error during callout or processing', exc);
+			result.isSuccessful = false;
+			if (performDML) {
+				Logger.saveLog();
+			}
+			if(throwException) {
+				throw exc;
+			}
 		}
 
-		if (throwException && caughtException != null) {
-			throw caughtException;
-		}
-
-
-		AccountTransferResult result = new AccountTransferResult();
+		// Return result
 		result.ondatoId = account.Ondato_Id__c;
 		result.exportDateTime = account.Last_Exported_to_Ondato__c;
-		result.isSuccessful = true;
-
 		return result;
 	}
 
