@@ -16,6 +16,7 @@ public with sharing class OndatoMatchModel {
 
 	public AML_Match__c getAmlMatch() {
 		AML_Match__c amlMatch = new AML_Match__c();
+		amlMatch.Match_Name__c = match;
 		amlMatch.Status__c = currentStatus;
 		amlMatch.Match_ID__c = matchId;
 		amlMatch.Account__r = new Account(Ondato_Id__c = resourceId);

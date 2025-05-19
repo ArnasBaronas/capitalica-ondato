@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>63.0</apiVersion>
+    <description>Image Url Viewer</description>
+    <isExposed>true</isExposed>
+    <masterLabel>Image Url Viewer</masterLabel>
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <objects>
+                <object>AML_Match__c</object>
+            </objects>
+            <property name="cardIcon" type="String" label="Component Icon" default="standard:photo" required="true"
+                      description="Icon name form https://www.lightningdesignsystem.com/icons."/>
+            <property label="Image URL field name" name="fieldName" type="String"
+                      description="Only URL fields can be selected" required="true"
+                      datasource="apex://AmlMatchUrlFieldPicklist">
+            </property>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>
