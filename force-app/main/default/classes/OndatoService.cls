@@ -208,10 +208,10 @@ public with sharing class OndatoService {
 
 		if (performDML) {
 			try {
-				update new AML_Match__c(
+				Database.update(new AML_Match__c(
 						Id = amlMatchId,
 						Status__c = matchReview.status
-				);
+				));
 			} catch (Exception ex) {
 				caughtException = ex;
 				Logger.error('Failed to update AML_Match__c with review status', ex);
