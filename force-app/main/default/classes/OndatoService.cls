@@ -150,8 +150,8 @@ public with sharing class OndatoService {
 	}
 
 	@AuraEnabled(Cacheable=false)
-	public static String sendMatchReview(Id amlMatchId, AmlMatchReviewModel matchReview) {
-		Logger.info(amlMatchId);
+	public static String sendMatchReview(Id amlMatchId, Object amlMatchReviewMap) {
+		AmlMatchReviewModel matchReview = (AmlMatchReviewModel) JSON.deserialize(JSON.serialize(amlMatchReviewMap), AmlMatchReviewModel.class);
 		Logger.info(JSON.serialize(matchReview));
 		Boolean exceptionThrown = false;
 		AML_Match__c amlMatch = [

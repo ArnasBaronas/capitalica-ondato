@@ -3,6 +3,7 @@ import sendMatchReview from '@salesforce/apex/OndatoService.sendMatchReview';
 import {ShowToastEvent} from "lightning/platformShowToastEvent";
 import { CloseActionScreenEvent } from 'lightning/actions';
 
+//TODO: get values from match status fields
 const MATCH_STATUSES = [
     { label: 'Open', value: 'Open' },
     { label: 'True Positive', value: 'TruePositive' },
@@ -10,6 +11,7 @@ const MATCH_STATUSES = [
     { label: 'Discarded', value: 'Discarded' },
 ];
 
+//TODO: mark existing status as default
 const DEFAULT_STATUS = 'FalsePositive';
 
 export default class AmlMatchReviewCreateForm extends LightningElement {
@@ -19,10 +21,12 @@ export default class AmlMatchReviewCreateForm extends LightningElement {
     @api
     objectApiName;
 
+    //TODO: change values on input changes
     amlMatchReview = {
         status: DEFAULT_STATUS,
-        clientRiskRating: undefined,
-        clientComment: undefined,
+        clientRiskRating: null,
+        clientComment: null,
+        //TODO: put current user name as clientUserId
         clientUserId: 'user@capitalica.lt'
     }
 
@@ -32,22 +36,19 @@ export default class AmlMatchReviewCreateForm extends LightningElement {
 
 
     createReview() {
-        console.error((JSON.stringify(this.amlMatchReview)));
-        sendMatchReview({amlMatchId: this.recordId, matchReview: this.amlMatchReview}).then(result => {
+        sendMatchReview({amlMatchId: this.recordId, amlMatchReviewMap: this.amlMatchReview}).then(result => {
             if (result) {
                 //TODO: update status via record ui API
-                console.log('success');
                 this.dispatchEvent(new ShowToastEvent({
                     title: 'Success',
-                    //message: reduceErrors(error).join(', '),
                     variant: 'success'
                 }));
-
             }
         }).catch(error => {
             console.error(error);
             this.dispatchEvent(new ShowToastEvent({
                 title: 'Error',
+                //TODO: import reduceErrors class
                 //message: reduceErrors(error).join(', '),
                 variant: 'error'
             }));
