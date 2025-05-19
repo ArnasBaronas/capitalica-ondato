@@ -8,6 +8,7 @@ import {CloseActionScreenEvent} from 'lightning/actions';
 import {api, LightningElement, track, wire} from 'lwc';
 
 import USER_ID from '@salesforce/user/Id';
+
 import USER_NAME_FIELD from '@salesforce/schema/User.Name';
 import USER_EMAIL_FIELD from '@salesforce/schema/User.Email';
 import AML_MATCH_OBJECT from '@salesforce/schema/AML_Match__c';
@@ -31,6 +32,8 @@ export default class AmlMatchReviewCreateForm extends LightningElement {
         clientUserId: undefined
     };
 
+    amlMatchScore;
+
     isSubmitDisabled = true;
 
     @wire(getRecord, {recordId: USER_ID, fields: USER_FIELDS_TO_QUERY})
@@ -46,6 +49,8 @@ export default class AmlMatchReviewCreateForm extends LightningElement {
     wiredAmlMatch({error, data}) {
         if (data) {
             this.amlMatchReview.status = data.fields.Status__c.value;
+            this.amlMatchScore = data.fields.Score__c.value;
+
         } else if (error) {
             console.error('Error fetching AML match:', error);
         }
@@ -60,11 +65,17 @@ export default class AmlMatchReviewCreateForm extends LightningElement {
     })
     wiredPicklistValues({ error, data }) {
         if (data) {
-            // TODO: Discarded can only be set to matches with the score 0
             this.matchStatusOptions = data.values.map(item => ({
                 label: item.label,
                 value: item.value
             }));
+            console.log(this.amlMatchScore)
+            if(this.amlMatchScore !== 0) {
+                this.matchStatusOptions = this.matchStatusOptions.filter(function( obj ) {
+                    return obj.value !== 'Discarded';
+                });
+                console.log(JSON.stringify(this.matchStatusOptions));
+            }
         } else if (error) {
             console.error('Error loading picklist values', error);
         }
