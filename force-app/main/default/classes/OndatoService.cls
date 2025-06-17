@@ -160,7 +160,7 @@ public with sharing class OndatoService {
 		return result;
 	}
 
-	public static AccountSendResult getAmlMatches(Id accountId, Boolean performDML, Boolean throwException) {
+	public static List<AML_Match__c> getAmlMatches(Id accountId, Boolean performDML, Boolean throwException) {
 		Account account = [
 				SELECT
 						Id, Name, Ondato_Id__c,
@@ -169,7 +169,7 @@ public with sharing class OndatoService {
 				WHERE Id = :accountId
 				WITH SECURITY_ENFORCED
 		];
-		return sendAccount(account, performDML, throwException);
+		return getAmlMatches(account, performDML, throwException);
 	}
 
 	public static List<AML_Match__c> getAmlMatches(Account account, Boolean performDML, Boolean throwException) {
@@ -211,12 +211,14 @@ public with sharing class OndatoService {
 			Logger.info('Response body');
 			Logger.info(response?.getBody());
 			Logger.error('Error during or processing callout', exc);
+			if(performDML) {
+				Logger.saveLog();
+			}
 			if (throwException) {
 				throw exc;
 			}
 		}
 		if (performDML) {
-			Logger.saveLog();
 			Database.upsert(matchRecords, AML_Match__c.Match_ID__c);
 		}
 		return matchRecords;

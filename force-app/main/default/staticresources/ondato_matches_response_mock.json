@@ -1,0 +1,26 @@
+{
+  "totalCount": 1,
+  "matches": [
+    {
+      "currentStatus": "Open",
+      "matchId": "432523",
+      "resourceId": "1f5a940e6a16d390bfe75055c3176f64c5b397880ff08e04b61ad7325af76cc4",
+      "score": 100,
+      "match": "Boyko Borissov",
+      "name": "Boyko Metodiev Borisov",
+      "countries": [
+        "US"
+      ],
+      "datesOfBirth": [
+        "1994",
+        "1994-08-22"
+      ],
+      "gender": "Male",
+      "profileImage": "https://www.acurisriskintelligence.com/cdn/content/0024300000/0024297990.jpg",
+      "dataSets": [
+        "ExternalPepCurrent",
+        "ExternalSanctionsCurrent"
+      ]
+    }
+  ]
+}
