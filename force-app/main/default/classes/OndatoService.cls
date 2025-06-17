@@ -40,7 +40,6 @@ public with sharing class OndatoService {
 			Logger.info('Request endpoint: ' + request.getEndpoint());
 			Logger.info('Request body: ' + requestBody);
 
-			//TODO: validate status code
 			response = new Http().send(request);
 			if (String.valueOf(response.getStatusCode()).startsWith('2') == false) {
 				throw new CalloutException(response.getBody());

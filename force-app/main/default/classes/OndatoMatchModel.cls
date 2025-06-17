@@ -26,9 +26,9 @@ public with sharing class OndatoMatchModel {
 		amlMatch.Worklist_Id__c = resourceId;
 		amlMatch.Account__c = accountId;
 		amlMatch.Score__c = score;
-		amlMatch.Source_List__c = String.join(dataSets, ';\n');
-		amlMatch.Dates_of_Birth__c = String.join(datesOfBirth, ';\n');
-		amlMatch.Countries_List__c = String.join(countries, ';\n');
+		amlMatch.Source_List__c = String.join(dataSets ??  new List<String>(), ';\n');
+		amlMatch.Dates_of_Birth__c = String.join(datesOfBirth ??  new List<String>(), ';\n');
+		amlMatch.Countries_List__c = String.join(countries ??  new List<String>(), ';\n');
 		return amlMatch;
 	}
 }
