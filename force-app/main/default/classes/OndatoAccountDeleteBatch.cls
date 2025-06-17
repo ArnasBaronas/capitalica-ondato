@@ -57,17 +57,12 @@ public with sharing class OndatoAccountDeleteBatch implements Schedulable, Datab
 		];
 
 		for (Account account : accounts) {
-			//OndatoService.AccountTransferResult transferResult;
-
-			if (account.IsPersonAccount) {
-				//transferResult = OndatoService.sendPersonAccount(account, false);
-			} else {
-				//transferResult = OndatoService.sendBusinessAccount(account, false);
+			OndatoService.AccountDeleteResult deleteResult;
+			deleteResult = OndatoService.deleteAccount(account, false, false);
+			if(deleteResult.isSuccessful) {
+				account.Ondato_Id__c = null;
+				accountsToUpdate.add(account);
 			}
-
-			account.Ondato_Id__c = null;
-			//account.Last_Exported_to_Ondato__c = transferResult.exportDateTime;
-			accountsToUpdate.add(account);
 		}
 
 		Logger.saveLog();

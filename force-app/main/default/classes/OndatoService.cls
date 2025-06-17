@@ -2,14 +2,15 @@ public with sharing class OndatoService {
 
 	public static final String worklistId = Ondato_Settings__c.getInstance().Worklist_Id__c;
 
-	public class AccountTransferResult {
+	public class AccountSendResult {
+		public Id salesforceId;
 		public String ondatoId;
 		public Datetime exportDateTime;
 		public Boolean isSuccessful;
 	}
 
-	public static AccountTransferResult sendAccount(Account account, Boolean performDML, Boolean throwException) {
-		AccountTransferResult result = new AccountTransferResult();
+	public static AccountSendResult sendAccount(Account account, Boolean performDML, Boolean throwException) {
+		AccountSendResult result = new AccountSendResult();
 		HttpRequest request = new HttpRequest();
 		HttpResponse response;
 		Exception caughtException;
@@ -41,6 +42,9 @@ public with sharing class OndatoService {
 
 			//TODO: validate status code
 			response = new Http().send(request);
+			if (String.valueOf(response.getStatusCode()).startsWith('2') == false) {
+				throw new CalloutException(response.getBody());
+			}
 
 			if (isNew) {
 				Map<String, Object> responseMap = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
@@ -61,7 +65,7 @@ public with sharing class OndatoService {
 			Logger.flushBuffer();
 		} catch (Exception exc) {
 			caughtException = exc;
-			Logger.error('Error during callout or processing', exc);
+			Logger.error('Error during or processing callout ', exc);
 			result.isSuccessful = false;
 			if (performDML) {
 				Logger.saveLog();
@@ -71,17 +75,70 @@ public with sharing class OndatoService {
 			}
 		}
 
-		// Return result
+		result.salesforceId = account.Id;
 		result.ondatoId = account.Ondato_Id__c;
 		result.exportDateTime = account.Last_Exported_to_Ondato__c;
 		return result;
 	}
 
-	public static Boolean deleteAccount(Account account, Boolean performDML, Boolean throwException) {
-		return true;
+	public class AccountDeleteResult {
+		public Id salesforceId;
+		public String ondatoId;
+		public Datetime deleteDateTime;
+		public Boolean isSuccessful;
 	}
 
-	public static List<AML_Match__c> getPersonAccountMatches(Account account, Boolean performDML, Boolean throwException) {
+	public static AccountDeleteResult deleteAccount(Account account, Boolean performDML, Boolean throwException) {
+		AccountDeleteResult result = new AccountDeleteResult();
+		result.salesforceId = account.Id;
+		result.ondatoId = account.Ondato_Id__c;
+		HttpRequest request = new HttpRequest();
+		HttpResponse response;
+
+		try {
+			Logger.info('Deleting "' + account.Name + '" account from Ondato', account.Id);
+			if(String.isBlank(account.Ondato_Id__c)) {
+				throw new HandledException('Account does not have Ondato Id');
+			}
+
+			request.setMethod('DELETE');
+			String baseEndpoint = 'callout:Ondato/v1/worklists/' + worklistId + OndatoServiceUtility.getEntityPath(account);
+			request.setEndpoint(baseEndpoint + account.Ondato_Id__c);
+			//request.setHeader('Content-Type', 'application/json');
+
+			Logger.info('Request endpoint: ' + request.getEndpoint());
+
+			//TODO: validate status code
+			response = new Http().send(request);
+
+			if (String.valueOf(response.getStatusCode()).startsWith('2') == false) {
+				throw new CalloutException(response.getBody());
+			}
+
+			account.Ondato_Id__c = null;
+			result.isSuccessful = true;
+			result.deleteDateTime = Datetime.now();
+
+			if (performDML) {
+				Database.update(account, AccessLevel.SYSTEM_MODE);
+			}
+			Logger.flushBuffer();
+		} catch (Exception exc) {
+			Logger.error('Error during or processing callout ', exc);
+			result.isSuccessful = false;
+			if (performDML) {
+				Logger.saveLog();
+			}
+			if(throwException) {
+				throw exc;
+			}
+		}
+
+
+		return result;
+	}
+
+	public static List<AML_Match__c> getAmlMatches(Account account, Boolean performDML, Boolean throwException) {
 		HttpRequest request = new HttpRequest();
 		request.setEndpoint('callout:Ondato/v1/worklists/' + worklistId + '/natural-entity-records/' + account.Ondato_Id__c + '/search');
 		request.setMethod('POST');
@@ -123,6 +180,10 @@ public with sharing class OndatoService {
 			Database.upsert(matchRecords, AML_Match__c.Match_ID__c);
 		}
 		return matchRecords;
+	}
+
+	public class MatchReviewSendResult {
+
 	}
 
 	@AuraEnabled(Cacheable=false)

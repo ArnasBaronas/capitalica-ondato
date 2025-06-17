@@ -55,12 +55,7 @@ public with sharing class OndatoMatchesImportBatch implements Schedulable, Datab
 		];
 
 		for (Account account : accounts) {
-			if (account.IsPersonAccount) {
-				amlMatches.addAll(OndatoService.getPersonAccountMatches(account, false, false));
-			} else {
-				//TODO: uncomment
-				//amlMatches.addAll(OndatoService.getBusinessAccountMatches(account, false));
-			}
+			amlMatches.addAll(OndatoService.getAmlMatches(account, false, false));
 		}
 
 		Logger.saveLog();
