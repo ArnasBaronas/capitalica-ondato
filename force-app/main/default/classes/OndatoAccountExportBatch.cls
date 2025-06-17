@@ -75,14 +75,14 @@ public with sharing class OndatoAccountExportBatch implements Schedulable, Datab
 	public void execute(Database.BatchableContext bContext, List<Id> accountIds) {
 		List<Account> accountsToUpdate = new List<Account>();
 		List<Account> accounts = [
-				SELECT Id, Name, Salutation, BillingCountry, IsPersonAccount,
+				SELECT Id, Name, Salutation, IsPersonAccount,
 						PersonBirthdate, Ondato_Id__c, Last_Exported_to_Ondato__c
 				FROM Account
 				WHERE Id IN :accountIds
 		];
 
 		for (Account account : accounts) {
-			OndatoService.AccountTransferResult transferResult = OndatoService.sendAccount(account, false, false);
+			OndatoService.AccountSendResult transferResult = OndatoService.sendAccount(account, false, false);
 			account.Ondato_Id__c = transferResult.ondatoId;
 			account.Last_Exported_to_Ondato__c = transferResult.exportDateTime;
 			accountsToUpdate.add(account);

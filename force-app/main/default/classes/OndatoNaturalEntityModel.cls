@@ -8,8 +8,6 @@ public with sharing class OndatoNaturalEntityModel {
 	public String name;
 	public String dateOfBirth;
 	public Gender gender;
-	//TODO: country is not being saved in Ondato
-	public String country;
 
 	public OndatoNaturalEntityModel(Account account) {
 		if(account.IsPersonAccount == false) {
@@ -17,7 +15,6 @@ public with sharing class OndatoNaturalEntityModel {
 		}
 		name = account.Name;
 		dateOfBirth = String.valueOf(account.PersonBirthdate);
-		country = account.BillingCountry;
 		switch on account.Salutation {
 			when 'Mr.' {
 				this.gender = OndatoNaturalEntityModel.Gender.Male;
