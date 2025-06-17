@@ -18,7 +18,7 @@ public with sharing class OndatoService {
 		try {
 			Logger.info('Sending "' + account.Name + '" account to Ondato', account.Id);
 
-			String baseEndpoint = 'callout:Ondato/v1/worklists/' + worklistId + OndatoServiceUtility.getEntityPath(account);
+			String baseEndpoint = 'callout:Ondato/v1/worklists/' + worklistId + getEntityPath(account);
 			Boolean isNew = String.isBlank(account.Ondato_Id__c);
 
 			if (isNew) {
@@ -101,7 +101,7 @@ public with sharing class OndatoService {
 			}
 
 			request.setMethod('DELETE');
-			String baseEndpoint = 'callout:Ondato/v1/worklists/' + worklistId + OndatoServiceUtility.getEntityPath(account);
+			String baseEndpoint = 'callout:Ondato/v1/worklists/' + worklistId + getEntityPath(account);
 			request.setEndpoint(baseEndpoint + account.Ondato_Id__c);
 			//request.setHeader('Content-Type', 'application/json');
 
@@ -142,7 +142,7 @@ public with sharing class OndatoService {
 		HttpRequest request = new HttpRequest();
 		{
 			String endpoint = 'callout:Ondato/v1/worklists/' + worklistId;
-			endpoint += OndatoServiceUtility.getEntityPath(account);
+			endpoint += getEntityPath(account);
 			endpoint += account.Ondato_Id__c + '/search';
 			request.setEndpoint(endpoint);
 		}
@@ -218,7 +218,7 @@ public with sharing class OndatoService {
 
 			{
 				String endpoint = 'callout:Ondato/v1/worklists/' + worklistId;
-				endpoint += OndatoServiceUtility.getEntityPath(amlMatch.Account__r);
+				endpoint += getEntityPath(amlMatch.Account__r);
 				endpoint += amlMatch.Account__r.Ondato_Id__c + '/matches/';
 				endpoint += amlMatch.Match_ID__c + '/reviews';
 				request.setEndpoint(endpoint);
@@ -263,5 +263,12 @@ public with sharing class OndatoService {
 		}
 		Logger.flushBuffer();
 		return matchReview.status;
+	}
+
+	private static String getEntityPath(Account account) {
+		if (account.IsPersonAccount) {
+			return '/natural-entity-records/';
+		}
+		return '/legal-entity-records/';
 	}
 }
