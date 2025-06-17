@@ -9,6 +9,18 @@ public with sharing class OndatoService {
 		public Boolean isSuccessful;
 	}
 
+	public static AccountSendResult sendAccount(Id accountId, Boolean performDML, Boolean throwException) {
+		Account account = [
+				SELECT
+						Id, Name,Ondato_Id__c,
+						IsPersonAccount
+				FROM Account
+				WHERE Id = :accountId
+				WITH SECURITY_ENFORCED
+		];
+		return sendAccount(account, performDML, throwException);
+	}
+
 	public static AccountSendResult sendAccount(Account account, Boolean performDML, Boolean throwException) {
 		AccountSendResult result = new AccountSendResult();
 		HttpRequest request = new HttpRequest();
@@ -69,7 +81,7 @@ public with sharing class OndatoService {
 			if (performDML) {
 				Logger.saveLog();
 			}
-			if(throwException) {
+			if (throwException) {
 				throw exc;
 			}
 		}
@@ -87,6 +99,18 @@ public with sharing class OndatoService {
 		public Boolean isSuccessful;
 	}
 
+	public static AccountSendResult deleteAccount(Id accountId, Boolean performDML, Boolean throwException) {
+		Account account = [
+				SELECT
+						Id, Name,Ondato_Id__c,
+						IsPersonAccount
+				FROM Account
+				WHERE Id = :accountId
+				WITH SECURITY_ENFORCED
+		];
+		return sendAccount(account, performDML, throwException);
+	}
+
 	public static AccountDeleteResult deleteAccount(Account account, Boolean performDML, Boolean throwException) {
 		AccountDeleteResult result = new AccountDeleteResult();
 		result.salesforceId = account.Id;
@@ -96,14 +120,13 @@ public with sharing class OndatoService {
 
 		try {
 			Logger.info('Deleting "' + account.Name + '" account from Ondato', account.Id);
-			if(String.isBlank(account.Ondato_Id__c)) {
+			if (String.isBlank(account.Ondato_Id__c)) {
 				throw new HandledException('Account does not have Ondato Id');
 			}
 
 			request.setMethod('DELETE');
 			String baseEndpoint = 'callout:Ondato/v1/worklists/' + worklistId + getEntityPath(account);
 			request.setEndpoint(baseEndpoint + account.Ondato_Id__c);
-			//request.setHeader('Content-Type', 'application/json');
 
 			Logger.info('Request endpoint: ' + request.getEndpoint());
 
@@ -128,13 +151,25 @@ public with sharing class OndatoService {
 			if (performDML) {
 				Logger.saveLog();
 			}
-			if(throwException) {
+			if (throwException) {
 				throw exc;
 			}
 		}
 
 
 		return result;
+	}
+
+	public static AccountSendResult getAmlMatches(Id accountId, Boolean performDML, Boolean throwException) {
+		Account account = [
+				SELECT
+						Id, Name,Ondato_Id__c,
+						IsPersonAccount
+				FROM Account
+				WHERE Id = :accountId
+				WITH SECURITY_ENFORCED
+		];
+		return sendAccount(account, performDML, throwException);
 	}
 
 	public static List<AML_Match__c> getAmlMatches(Account account, Boolean performDML, Boolean throwException) {
