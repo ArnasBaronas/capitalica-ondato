@@ -1,8 +1,8 @@
-public with sharing class OndatoAccountDeleteBatch implements Schedulable, Database.Batchable<Id> {
+public with sharing class OndatoAccountDeleteBatch implements Schedulable, Database.Batchable<Id>, Database.AllowsCallouts {
 
 	/** @description Executes the batch job immediately. */
 	public static void execute() {
-		new OndatoAccountExportBatch().execute(null);
+		new OndatoAccountDeleteBatch().execute(null);
 	}
 
 	/**
@@ -51,7 +51,9 @@ public with sharing class OndatoAccountDeleteBatch implements Schedulable, Datab
 	public void execute(Database.BatchableContext bContext, List<Id> accountIds) {
 		List<Account> accountsToUpdate = new List<Account>();
 		List<Account> accounts = [
-				SELECT Id, Ondato_Id__c
+				SELECT
+						Id, IsPersonAccount,
+						Name, Ondato_Id__c
 				FROM Account
 				WHERE Id IN :accountIds
 		];
