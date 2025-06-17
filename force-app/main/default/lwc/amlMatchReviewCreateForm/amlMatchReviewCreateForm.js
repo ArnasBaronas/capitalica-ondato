@@ -22,7 +22,7 @@ export default class AmlMatchReviewCreateForm extends LightningElement {
 
     @track amlMatchReview = {
         status: '',
-        clientRiskRating: '',
+        //clientRiskRating: '',
         clientComment: '',
         clientUserId: ''
     };
@@ -77,8 +77,8 @@ export default class AmlMatchReviewCreateForm extends LightningElement {
     }
 
     validateForm() {
-        const { status, clientRiskRating, clientComment, clientUserId } = this.amlMatchReview;
-        this.isSubmitDisabled = !status || !clientRiskRating || !clientComment || !clientUserId;
+        const { status, /*clientRiskRating,*/ clientComment, clientUserId } = this.amlMatchReview;
+        this.isSubmitDisabled = !status /*|| !clientRiskRating*/ || !clientComment || !clientUserId;
     }
 
     createReview() {
