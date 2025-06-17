@@ -1,4 +1,4 @@
-public with sharing class AmlMatchReviewModel {
+public with sharing class OndatoAmlMatchReviewModel {
 
 	@AuraEnabled
 	public String status;

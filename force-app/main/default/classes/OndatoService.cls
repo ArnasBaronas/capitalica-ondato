@@ -138,8 +138,14 @@ public with sharing class OndatoService {
 	}
 
 	public static List<AML_Match__c> getAmlMatches(Account account, Boolean performDML, Boolean throwException) {
+
 		HttpRequest request = new HttpRequest();
-		request.setEndpoint('callout:Ondato/v1/worklists/' + worklistId + '/natural-entity-records/' + account.Ondato_Id__c + '/search');
+		{
+			String endpoint = 'callout:Ondato/v1/worklists/' + worklistId;
+			endpoint += OndatoServiceUtility.getEntityPath(account);
+			endpoint += account.Ondato_Id__c + '/search';
+			request.setEndpoint(endpoint);
+		}
 		request.setMethod('POST');
 		request.setBody('{}');
 		request.setHeader('Content-Type', 'application/json');
@@ -187,8 +193,8 @@ public with sharing class OndatoService {
 
 	@AuraEnabled(Cacheable=false)
 	public static String sendMatchReview(Id amlMatchId, Object amlMatchReviewMap, Boolean performDML) {
-		//TODO: Accept AmlMatchReviewModel as parameter.
-		AmlMatchReviewModel matchReview = (AmlMatchReviewModel) JSON.deserialize(JSON.serialize(amlMatchReviewMap), AmlMatchReviewModel.class);
+		//TODO: Accept OndatoAmlMatchReviewModel as parameter.
+		OndatoAmlMatchReviewModel matchReview = (OndatoAmlMatchReviewModel) JSON.deserialize(JSON.serialize(amlMatchReviewMap), OndatoAmlMatchReviewModel.class);
 
 		Exception caughtException;
 		HttpRequest request = new HttpRequest();
