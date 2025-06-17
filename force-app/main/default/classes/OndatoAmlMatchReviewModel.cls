@@ -1,11 +1,11 @@
 public with sharing class OndatoAmlMatchReviewModel {
 
 	@AuraEnabled
-	public String status;
+	public String status { get; set; }
 	@AuraEnabled
-	public String clientRiskRating;
+	public String clientRiskRating { get; set; }
 	@AuraEnabled
-	public String clientComment;
+	public String clientComment { get; set; }
 	@AuraEnabled
-	public String clientUserId;
+	public String clientUserId { get; set; }
 }

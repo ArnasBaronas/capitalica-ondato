@@ -85,7 +85,7 @@ export default class AmlMatchReviewCreateForm extends LightningElement {
         this.isSubmitDisabled = true;
         sendMatchReview({
             amlMatchId: this.recordId,
-            amlMatchReviewMap: this.amlMatchReview,
+            amlMatchReview: this.amlMatchReview,
             performDML: false
         })
             .then(matchStatus => {
