@@ -160,7 +160,7 @@ public with sharing class OndatoService {
 		return result;
 	}
 
-	public static List<AML_Match__c> getAmlMatches(Id accountId, Boolean performDML, Boolean throwException) {
+	public static List<Ondato_AML_Match__c> getAmlMatches(Id accountId, Boolean performDML, Boolean throwException) {
 		Account account = [
 				SELECT
 						Id, Name, Ondato_Id__c,
@@ -172,7 +172,7 @@ public with sharing class OndatoService {
 		return getAmlMatches(account, performDML, throwException);
 	}
 
-	public static List<AML_Match__c> getAmlMatches(Account account, Boolean performDML, Boolean throwException) {
+	public static List<Ondato_AML_Match__c> getAmlMatches(Account account, Boolean performDML, Boolean throwException) {
 
 		HttpRequest request = new HttpRequest();
 		{
@@ -188,7 +188,7 @@ public with sharing class OndatoService {
 		if (account.Ondato_Id__c == null) {
 			Logger.error('Cannot retrieve matches for account "' + account.Name + '" — it does not exist in the Ondato worklist.', account.Id);
 		}
-		List<AML_Match__c> matchRecords = new List<AML_Match__c>();
+		List<Ondato_AML_Match__c> matchRecords = new List<Ondato_AML_Match__c>();
 
 		Logger.info('Request endpoint');
 		Logger.info(request.getEndpoint());
@@ -201,7 +201,7 @@ public with sharing class OndatoService {
 			}
 			OndatoMatchModel.Response matchesResponse = (OndatoMatchModel.Response) JSON.deserialize(response.getBody(), OndatoMatchModel.Response.class);
 			for (OndatoMatchModel matchInResponse : matchesResponse.matches) {
-				AML_Match__c matchRecord = matchInResponse.getAmlMatch(account.Id);
+				Ondato_AML_Match__c matchRecord = matchInResponse.getAmlMatch(account.Id);
 				matchRecords.add(matchRecord);
 			}
 			Logger.flushBuffer();
@@ -219,7 +219,7 @@ public with sharing class OndatoService {
 			}
 		}
 		if (performDML) {
-			Database.upsert(matchRecords, AML_Match__c.Match_ID__c);
+			Database.upsert(matchRecords, Ondato_AML_Match__c.Match_ID__c);
 		}
 		return matchRecords;
 	}
@@ -242,14 +242,14 @@ public with sharing class OndatoService {
 		Exception caughtException;
 		HttpRequest request = new HttpRequest();
 		HttpResponse response;
-		AML_Match__c amlMatch;
+		Ondato_AML_Match__c amlMatch;
 
 		try {
 			amlMatch = [
 					SELECT
 							Id, Match_ID__c,
 							Account__r.Id, Account__r.IsPersonAccount, Account__r.Ondato_Id__c
-					FROM AML_Match__c
+					FROM Ondato_AML_Match__c
 					WHERE Id = :amlMatchId
 					WITH SECURITY_ENFORCED
 			];
@@ -293,13 +293,13 @@ public with sharing class OndatoService {
 
 		if (performDML) {
 			try {
-				Database.update(new AML_Match__c(
+				Database.update(new Ondato_AML_Match__c(
 						Id = amlMatchId,
 						Status__c = amlMatchReview.status
 				));
 			} catch (Exception ex) {
 				caughtException = ex;
-				Logger.error('Failed to update AML_Match__c with review status', ex);
+				Logger.error('Failed to update Ondato_AML_Match__c with review status', ex);
 				Logger.saveLog();
 				throw caughtException;
 			}

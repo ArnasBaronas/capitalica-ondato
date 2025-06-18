@@ -1,13 +1,13 @@
 /**
- * @description This class part of Ondato x Salesforce integration. It provides a dynamic picklist of URL-type fields for the AML_Match__c object,
+ * @description This class part of Ondato x Salesforce integration. It provides a dynamic picklist of URL-type fields for the Ondato_AML_Match__c object,
  *              specifically intended for imageUrlViewer lwc component for configuration in lightning app builder. It allows users
  *              to select from valid fields (of type URL) and defines a default image field selection in lightning app builder.
  *
  * @author <a href="mailto:arnasbaronas@gmail.com">Arnas Baronas</a>
  */
-public with sharing class AmlMatchUrlFieldPicklist extends VisualEditor.DynamicPickList {
+public with sharing class OndatoAmlMatchUrlFieldPicklist extends VisualEditor.DynamicPickList {
 
-	/** @description The default field name for image URLs used in the AML_Match__c object. */
+	/** @description The default field name for image URLs used in the Ondato_AML_Match__c object. */
 	@TestVisible
 	static final String DEFAULT_IMAGE_FIELD_NAME = 'Profile_Image__c';
 
@@ -24,7 +24,7 @@ public with sharing class AmlMatchUrlFieldPicklist extends VisualEditor.DynamicP
      */
 	public override VisualEditor.DataRow getDefaultValue() {
 		VisualEditor.DataRow defaultField;
-		Schema.DescribeFieldResult fieldInformation = Schema.SObjectType.AML_Match__c.fields.getMap().get(DEFAULT_IMAGE_FIELD_NAME)?.getDescribe();
+		Schema.DescribeFieldResult fieldInformation = Schema.SObjectType.Ondato_AML_Match__c.fields.getMap().get(DEFAULT_IMAGE_FIELD_NAME)?.getDescribe();
 		if (fieldInformation != null) {
 			defaultField = new VisualEditor.DataRow(fieldInformation.getLabel(), fieldInformation.getName());
 		}
@@ -32,7 +32,7 @@ public with sharing class AmlMatchUrlFieldPicklist extends VisualEditor.DynamicP
 	}
 
 	/**
-	 * @description Returns all valid picklist options for the AML_Match__c object,
+	 * @description Returns all valid picklist options for the Ondato_AML_Match__c object,
 	 *              filtering only fields of type URL and excluding the initial placeholder option.
 	 *
 	 * @return VisualEditor.DynamicPickListRows A list of picklist rows with label and value.
@@ -40,7 +40,7 @@ public with sharing class AmlMatchUrlFieldPicklist extends VisualEditor.DynamicP
 	public override VisualEditor.DynamicPickListRows getValues() {
 		VisualEditor.DynamicPickListRows availableFields = new VisualEditor.DynamicPickListRows();
 
-		List<FieldOption> fieldOptions = getFieldsAsOptions(AML_Match__c.SObjectType.getDescribe().getName());
+		List<FieldOption> fieldOptions = getFieldsAsOptions(Ondato_AML_Match__c.SObjectType.getDescribe().getName());
 		fieldOptions.remove(0); //Removing first empty value
 		for (FieldOption fieldOption : fieldOptions) {
 			availableFields.addRow(new VisualEditor.DataRow(fieldOption.label, fieldOption.value));

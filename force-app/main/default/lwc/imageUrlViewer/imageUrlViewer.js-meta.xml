@@ -16,7 +16,7 @@
                       description="Icon name form https://www.lightningdesignsystem.com/icons."/>
             <property label="Image URL field name" name="fieldName" type="String"
                       description="Only URL fields can be selected" required="true"
-                      datasource="apex://AmlMatchUrlFieldPicklist">
+                      datasource="apex://OndatoAmlMatchUrlFieldPicklist">
             </property>
         </targetConfig>
     </targetConfigs>

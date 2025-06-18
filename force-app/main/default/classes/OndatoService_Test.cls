@@ -167,7 +167,7 @@ private class OndatoService_Test {
 		OndatoService.getAmlMatches([SELECT Id FROM Account].Id, true, true);
 		Test.stopTest();
 		Assert.areEqual(0, [SELECT Id FROM Log__c].size(), 'Log should not be created');
-		Assert.areEqual(1, [SELECT Id FROM AML_Match__c].size(), '1 AML match should be created');
+		Assert.areEqual(1, [SELECT Id FROM Ondato_AML_Match__c].size(), '1 AML match should be created');
 	}
 
 	@IsTest
@@ -186,13 +186,13 @@ private class OndatoService_Test {
 
 		Assert.isTrue(exceptionThrown, 'An exception must be thrown.');
 		Assert.areEqual(1, [SELECT Id FROM Log__c].size(), 'Log should be created');
-		Assert.areEqual(0, [SELECT Id FROM AML_Match__c].size(), 'No AML matches should be created');
+		Assert.areEqual(0, [SELECT Id FROM Ondato_AML_Match__c].size(), 'No AML matches should be created');
 	}
 
 	@IsTest
 	@SuppressWarnings('PMD.MethodNamingConventions') // method name after underscore represents test scenario
 	static void sendMatchReview_success() {
-		AML_Match__c amlMatch = new AML_Match__c(
+		Ondato_AML_Match__c amlMatch = new Ondato_AML_Match__c(
 				Name = '001',
 				Match_ID__c = '001',
 				Match_Name__c = 'Test Tester',
@@ -216,13 +216,13 @@ private class OndatoService_Test {
 		Test.stopTest();
 
 		Assert.areEqual(0, [SELECT Id FROM Log__c].size(), 'Log should not be created');
-		Assert.areEqual(1, [SELECT Id FROM AML_Match__c WHERE Status__c = 'TruePositive'].size(), 'AML match status was not updated');
+		Assert.areEqual(1, [SELECT Id FROM Ondato_AML_Match__c WHERE Status__c = 'TruePositive'].size(), 'AML match status was not updated');
 	}
 
 	@IsTest
 	@SuppressWarnings('PMD.MethodNamingConventions') // method name after underscore represents test scenario
 	static void sendMatchReview_calloutFailure() {
-		AML_Match__c amlMatch = new AML_Match__c(
+		Ondato_AML_Match__c amlMatch = new Ondato_AML_Match__c(
 				Name = '001',
 				Match_ID__c = '001',
 				Match_Name__c = 'Test Tester',
@@ -250,13 +250,13 @@ private class OndatoService_Test {
 
 		Assert.isTrue(exceptionThrown, 'An exception must be thrown.');
 		Assert.areEqual(1, [SELECT Id FROM Log__c].size(), 'Log should be created');
-		Assert.areEqual(0, [SELECT Id FROM AML_Match__c WHERE Status__c = 'Invalid'].size(), 'AML match status was updated');
+		Assert.areEqual(0, [SELECT Id FROM Ondato_AML_Match__c WHERE Status__c = 'Invalid'].size(), 'AML match status was updated');
 	}
 
 	@IsTest
 	@SuppressWarnings('PMD.MethodNamingConventions') // method name after underscore represents test scenario
 	static void sendMatchReview_dmlFailure() {
-		AML_Match__c amlMatch = new AML_Match__c(
+		Ondato_AML_Match__c amlMatch = new Ondato_AML_Match__c(
 				Name = '001',
 				Match_ID__c = '001',
 				Match_Name__c = 'Test Tester',
@@ -287,6 +287,6 @@ private class OndatoService_Test {
 
 		Assert.isTrue(exceptionThrown, 'An exception must be thrown.');
 		Assert.areEqual(1, [SELECT Id FROM Log__c].size(), 'Log should be created');
-		Assert.areEqual(0, [SELECT Id FROM AML_Match__c WHERE Status__c = 'Invalid'].size(), 'AML match status was updated');
+		Assert.areEqual(0, [SELECT Id FROM Ondato_AML_Match__c WHERE Status__c = 'Invalid'].size(), 'AML match status was updated');
 	}
 }

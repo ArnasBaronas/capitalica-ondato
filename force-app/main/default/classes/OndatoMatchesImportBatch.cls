@@ -47,7 +47,7 @@ public with sharing class OndatoMatchesImportBatch implements Schedulable, Datab
 	 * @param accountIds List of Account record IDs to process in this batch.
 	 */
 	public void execute(Database.BatchableContext bContext, List<Id> accountIds) {
-		List<AML_Match__c> amlMatches = new List<AML_Match__c>();
+		List<Ondato_AML_Match__c> amlMatches = new List<Ondato_AML_Match__c>();
 		List<Account> accounts = [
 				SELECT Id, Name, Ondato_Id__c, IsPersonAccount
 				FROM Account
@@ -59,7 +59,7 @@ public with sharing class OndatoMatchesImportBatch implements Schedulable, Datab
 		}
 
 		Logger.saveLog();
-		Database.upsert(amlMatches, AML_Match__c.Match_ID__c);
+		Database.upsert(amlMatches, Ondato_AML_Match__c.Match_ID__c);
 	}
 
 	/**

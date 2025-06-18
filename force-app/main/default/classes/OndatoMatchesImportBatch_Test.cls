@@ -18,7 +18,7 @@ private class OndatoMatchesImportBatch_Test {
 		}
 
 		Assert.areEqual(0, [SELECT Id FROM Log__c].size(), 'Log should not be created');
-		Assert.areEqual(1, [SELECT Id FROM AML_Match__c].size(), '1 AML match should be created');
+		Assert.areEqual(1, [SELECT Id FROM Ondato_AML_Match__c].size(), '1 AML match should be created');
 	}
 
 	@IsTest

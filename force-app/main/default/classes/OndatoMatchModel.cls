@@ -16,8 +16,8 @@ public with sharing class OndatoMatchModel {
 	public List<String> countries;
 	public List<String> dataSets;
 
-	public AML_Match__c getAmlMatch(Id accountId) {
-		AML_Match__c amlMatch = new AML_Match__c();
+	public Ondato_AML_Match__c getAmlMatch(Id accountId) {
+		Ondato_AML_Match__c amlMatch = new Ondato_AML_Match__c();
 		amlMatch.Match_Name__c = match;
 		amlMatch.Status__c = currentStatus;
 		amlMatch.Name = matchId;
