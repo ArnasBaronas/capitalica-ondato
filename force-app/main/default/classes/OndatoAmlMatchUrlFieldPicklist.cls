@@ -40,7 +40,7 @@ public with sharing class OndatoAmlMatchUrlFieldPicklist extends VisualEditor.Dy
 	public override VisualEditor.DynamicPickListRows getValues() {
 		VisualEditor.DynamicPickListRows availableFields = new VisualEditor.DynamicPickListRows();
 
-		List<FieldOption> fieldOptions = getFieldsAsOptions(Ondato_AML_Match__c.SObjectType.getDescribe().getName());
+		List<FieldOption> fieldOptions = getFieldsAsOptions(Ondato_AML_Match__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName());
 		fieldOptions.remove(0); //Removing first empty value
 		for (FieldOption fieldOption : fieldOptions) {
 			availableFields.addRow(new VisualEditor.DataRow(fieldOption.label, fieldOption.value));

@@ -9,6 +9,6 @@ private class OndatoAmlMatchUrlFieldPicklist_Test {
 
 	@IsTest
 	static void testFieldAsOptions() {
-		Assert.isTrue(OndatoAmlMatchUrlFieldPicklist.getFieldsAsOptions(Account.SObjectType.getDescribe().getName()).size() > 1);
+		Assert.isTrue(OndatoAmlMatchUrlFieldPicklist.getFieldsAsOptions(Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName()).size() > 1);
 	}
 }

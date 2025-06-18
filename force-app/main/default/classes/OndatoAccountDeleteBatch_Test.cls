@@ -4,7 +4,7 @@ private class OndatoAccountDeleteBatch_Test {
 	@TestSetup
 	static void setup() {
 		OndatoService_Test.setup();
-		Account account = [SELECT Id FROM Account];
+		Account account = [SELECT Id FROM Account LIMIT 1];
 		account.Stage__c = 'Closed';
 		Database.update(account, AccessLevel.SYSTEM_MODE);
 	}

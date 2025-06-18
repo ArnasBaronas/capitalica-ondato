@@ -1,6 +1,7 @@
+@SuppressWarnings('PMD.CyclomaticComplexity, PMD.CognitiveComplexity')
 public with sharing class OndatoService {
 
-	public static final String worklistId = Ondato_Settings__c.getInstance().Worklist_Id__c;
+	public static final String WORKLIST_ID = Ondato_Settings__c.getInstance().Worklist_Id__c;
 
 	public class AccountSendResult {
 		public Id salesforceId;
@@ -21,6 +22,10 @@ public with sharing class OndatoService {
 		return sendAccount(account, performDML, throwException);
 	}
 
+	@SuppressWarnings('PMD.NcssMethodCount, PMD.CyclomaticComplexity')
+	// In order to keep the code easy to read and avoid excessive fragmentation into helper methods,
+	// some cyclomatic complexity rules may be intentionally violated. This approach prioritizes clarity
+	// over strict adherence to complexity metrics.
 	public static AccountSendResult sendAccount(Account account, Boolean performDML, Boolean throwException) {
 		AccountSendResult result = new AccountSendResult();
 		HttpRequest request = new HttpRequest();
@@ -30,7 +35,7 @@ public with sharing class OndatoService {
 		try {
 			Logger.info('Sending "' + account.Name + '" account to Ondato', account.Id);
 
-			String baseEndpoint = 'callout:Ondato/v1/worklists/' + worklistId + getEntityPath(account);
+			String baseEndpoint = 'callout:Ondato/v1/worklists/' + WORKLIST_ID + getEntityPath(account);
 			Boolean isNew = String.isBlank(account.Ondato_Id__c);
 
 			if (isNew) {
@@ -111,6 +116,10 @@ public with sharing class OndatoService {
 		return deleteAccount(account, performDML, throwException);
 	}
 
+	@SuppressWarnings('PMD.NcssMethodCount, PMD.CyclomaticComplexity')
+	// In order to keep the code easy to read and avoid excessive fragmentation into helper methods,
+	// some cyclomatic complexity rules may be intentionally violated. This approach prioritizes clarity
+	// over strict adherence to complexity metrics.
 	public static AccountDeleteResult deleteAccount(Account account, Boolean performDML, Boolean throwException) {
 		AccountDeleteResult result = new AccountDeleteResult();
 		result.salesforceId = account.Id;
@@ -125,7 +134,7 @@ public with sharing class OndatoService {
 			}
 
 			request.setMethod('DELETE');
-			String baseEndpoint = 'callout:Ondato/v1/worklists/' + worklistId + getEntityPath(account);
+			String baseEndpoint = 'callout:Ondato/v1/worklists/' + WORKLIST_ID + getEntityPath(account);
 			request.setEndpoint(baseEndpoint + account.Ondato_Id__c);
 
 			Logger.info('Request endpoint: ' + request.getEndpoint());
@@ -172,11 +181,15 @@ public with sharing class OndatoService {
 		return getAmlMatches(account, performDML, throwException);
 	}
 
+	@SuppressWarnings('PMD.NcssMethodCount, PMD.CyclomaticComplexity')
+	// In order to keep the code easy to read and avoid excessive fragmentation into helper methods,
+	// some cyclomatic complexity rules may be intentionally violated. This approach prioritizes clarity
+	// over strict adherence to complexity metrics.
 	public static List<Ondato_AML_Match__c> getAmlMatches(Account account, Boolean performDML, Boolean throwException) {
 
 		HttpRequest request = new HttpRequest();
 		{
-			String endpoint = 'callout:Ondato/v1/worklists/' + worklistId;
+			String endpoint = 'callout:Ondato/v1/worklists/' + WORKLIST_ID;
 			endpoint += getEntityPath(account);
 			endpoint += account.Ondato_Id__c + '/search';
 			request.setEndpoint(endpoint);
@@ -219,7 +232,7 @@ public with sharing class OndatoService {
 			}
 		}
 		if (performDML) {
-			Database.upsert(matchRecords, Ondato_AML_Match__c.Match_ID__c);
+			Database.upsert(matchRecords, Ondato_AML_Match__c.Match_ID__c, AccessLevel.SYSTEM_MODE);
 		}
 		return matchRecords;
 	}
@@ -237,6 +250,10 @@ public with sharing class OndatoService {
 		public String ondatoMatchId;
 	}
 
+	@SuppressWarnings('PMD.NcssMethodCount')
+	// In order to keep the code easy to read and avoid excessive fragmentation into helper methods,
+	// some cyclomatic complexity rules may be intentionally violated. This approach prioritizes clarity
+	// over strict adherence to complexity metrics.
 	@AuraEnabled(Cacheable=false)
 	public static MatchReviewSendResult sendMatchReview(Id amlMatchId, OndatoAmlMatchReviewModel amlMatchReview, Boolean performDML) {
 		Exception caughtException;
@@ -260,7 +277,7 @@ public with sharing class OndatoService {
 			request.setBody(JSON.serialize(amlMatchReview, true));
 
 			{
-				String endpoint = 'callout:Ondato/v1/worklists/' + worklistId;
+				String endpoint = 'callout:Ondato/v1/worklists/' + WORKLIST_ID;
 				endpoint += getEntityPath(amlMatch.Account__r);
 				endpoint += amlMatch.Account__r.Ondato_Id__c + '/matches/';
 				endpoint += amlMatch.Match_ID__c + '/reviews';
@@ -296,7 +313,7 @@ public with sharing class OndatoService {
 				Database.update(new Ondato_AML_Match__c(
 						Id = amlMatchId,
 						Status__c = amlMatchReview.status
-				));
+				), AccessLevel.SYSTEM_MODE);
 			} catch (Exception ex) {
 				caughtException = ex;
 				Logger.error('Failed to update Ondato_AML_Match__c with review status', ex);

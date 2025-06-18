@@ -41,6 +41,7 @@ export default class ImageUrlViewer extends LightningElement {
                 const fieldData = data.fields?.[this.fieldName];
                 this.imageUrl = fieldData?.value || null;
             } catch (e) {
+                console.error(`Error accessing field "${this.fieldName}":`, e);
                 this.error = `Error accessing field "${this.fieldName}"`;
             }
         }

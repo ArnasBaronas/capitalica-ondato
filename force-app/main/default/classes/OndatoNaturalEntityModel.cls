@@ -1,8 +1,8 @@
 public with sharing class OndatoNaturalEntityModel {
 
 	public enum Gender {
-		Male,
-		Female
+		MALE,
+		FEMALE
 	}
 
 	public String name;
@@ -17,10 +17,10 @@ public with sharing class OndatoNaturalEntityModel {
 		dateOfBirth = String.valueOf(account.PersonBirthdate);
 		switch on account.Salutation {
 			when 'Mr.' {
-				this.gender = OndatoNaturalEntityModel.Gender.Male;
+				this.gender = OndatoNaturalEntityModel.Gender.MALE;
 			}
 			when 'Ms.', 'Mrs.' {
-				this.gender = OndatoNaturalEntityModel.Gender.Female;
+				this.gender = OndatoNaturalEntityModel.Gender.FEMALE;
 			}
 		}
 	}

@@ -1,10 +1,5 @@
 public with sharing class OndatoMatchModel {
 
-	public class Response {
-		public Integer totalCount;
-		public List<OndatoMatchModel> matches;
-	}
-
 	public String currentStatus;
 	public String matchId;
 	public String resourceId;
@@ -15,6 +10,11 @@ public with sharing class OndatoMatchModel {
 	public List<String> datesOfBirth;
 	public List<String> countries;
 	public List<String> dataSets;
+
+	public class Response {
+		public Integer totalCount;
+		public List<OndatoMatchModel> matches;
+	}
 
 	public Ondato_AML_Match__c getAmlMatch(Id accountId) {
 		Ondato_AML_Match__c amlMatch = new Ondato_AML_Match__c();

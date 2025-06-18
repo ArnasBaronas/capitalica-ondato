@@ -18,7 +18,7 @@ private class OndatoEntityModel_Test {
 		];
 
 		OndatoNaturalEntityModel maleNaturalEntityModel = new OndatoNaturalEntityModel(malePersonAccount);
-		Assert.areEqual(OndatoNaturalEntityModel.Gender.Male, maleNaturalEntityModel.gender);
+		Assert.areEqual(OndatoNaturalEntityModel.Gender.MALE, maleNaturalEntityModel.gender);
 
 		Account femalePersonAccount = new Account(
 				Salutation = 'Ms.',
@@ -35,10 +35,11 @@ private class OndatoEntityModel_Test {
 		];
 
 		OndatoNaturalEntityModel femaleNaturalEntityModel = new OndatoNaturalEntityModel(femalePersonAccount);
-		Assert.areEqual(OndatoNaturalEntityModel.Gender.Female, femaleNaturalEntityModel.gender);
+		Assert.areEqual(OndatoNaturalEntityModel.Gender.FEMALE, femaleNaturalEntityModel.gender);
 	}
 
 	@IsTest
+	@SuppressWarnings('PMD.MethodNamingConventions') // method name after underscore represents test scenario
 	static void naturalEntityModel_error() {
 		Account businessAccount = new Account(
 				Name = 'Test inc.'
@@ -62,6 +63,7 @@ private class OndatoEntityModel_Test {
 	}
 
 	@IsTest
+	@SuppressWarnings('PMD.MethodNamingConventions') // method name after underscore represents test scenario
 	static void legalEntityModel() {
 		Account businessAccount = new Account(
 				Name = 'Test inc.'
@@ -79,6 +81,7 @@ private class OndatoEntityModel_Test {
 	}
 
 	@IsTest
+	@SuppressWarnings('PMD.MethodNamingConventions') // method name after underscore represents test scenario
 	static void legalEntityModel_error() {
 		Account malePersonAccount = new Account(
 				Salutation = 'Mr.',

@@ -96,6 +96,7 @@ public with sharing class OndatoAccountExportBatch implements Schedulable, Datab
      * @description Finalizes the batch process by logging the job details.
      * @param bContext Database.BatchableContext
      */
+	@SuppressWarnings('PMD.AvoidDebugStatements')
 	public void finish(Database.BatchableContext bContext) {
 		AsyncApexJob apexJob = [
 				SELECT Id, Status, NumberOfErrors, JobItemsProcessed, TotalJobItems
