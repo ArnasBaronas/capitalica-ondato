@@ -1,9 +1,23 @@
+/**
+ * @description Batch Apex class responsible for exporting `Account` records to the Ondato system.
+ *
+ * Batch size is controlled by `Ondato_Settings__c.Accounts_Export_Batch_Size__c`.
+ *
+ * @author <a href="mailto:arnasbaronas@gmail.com">Arnas Baronas</a>
+ */
 public with sharing class OndatoAccountExportBatch implements Schedulable, Database.Batchable<Id>, Database.AllowsCallouts {
 
+	/** @description Predefined relationship roles considered closely related to active investors. */
 	static final List<String> CLOSELY_RELATED_ROLES = new List<String>{
 			'Spouse', 'Authorised Representative', 'Executive', 'Authorised Representative', 'Beneficiary'
 	};
 
+	/**
+     * @description Retrieves a list of Account IDs that are either direct investors (Stage__c = 'Active_Investing')
+     * or are closely related to such investors via `AccountContactRelation`.
+     *
+     * @return List of Account Ids eligible for screening/export.
+     */
 	public static List<Id> getAccountIdsForScreening() {
 		List<Id> directInvestors = new List<Id>(new Map<Id, SObject>([
 				SELECT Id
@@ -60,12 +74,19 @@ public with sharing class OndatoAccountExportBatch implements Schedulable, Datab
 		System.schedule(jobName, cronExpression, batch);
 	}
 
+	/**
+     * @description Prepares the list of Account record IDs to be processed by the batch job.
+     * This includes both direct investors and their closely related contacts.
+     *
+     * @param bContext The batch context (unused in this method).
+     * @return List of Account Ids to export to Ondato.
+     */
 	public List<Id> start(Database.BatchableContext bContext) {
 		return getAccountIdsForScreening();
 	}
 
 	/**
-	 * Batch execute method to export a list of Accounts to the Ondato system.
+	 * @description Batch execute method to export a list of Accounts to the Ondato system.
 	 * It handles both Person Accounts and Business Accounts, and updates each record
 	 * with the returned Ondato ID and export timestamp.
 	 *

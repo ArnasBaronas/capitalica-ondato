@@ -1,3 +1,12 @@
+/**
+ * @description Batch Apex implementation for importing AML match records from the Ondato system into Salesforce.
+ * This job processes accounts with a non-null Ondato ID and retrieves their corresponding AML match records via callouts.
+ *
+ * Match records are upserted using the external ID field `Match_ID__c` on `Ondato_AML_Match__c`.
+ *  Batch size is controlled by `Ondato_Settings__c.Matches_Import_Batch_Size__c`.
+ *
+ * @author <a href="mailto:arnasbaronas@gmail.com">Arnas Baronas</a>
+ */
 public with sharing class OndatoMatchesImportBatch implements Schedulable, Database.Batchable<Id>, Database.AllowsCallouts {
 
 	/** @description Executes the batch job immediately. */
@@ -27,6 +36,12 @@ public with sharing class OndatoMatchesImportBatch implements Schedulable, Datab
 		System.schedule(jobName, cronExpression, batch);
 	}
 
+	/**
+	 * @description Start method to define the scope of the batch process.
+	 * Retrieves all Account records that have a value in the `Ondato_Id__c` field.
+	 * @param bContext Batchable context object.
+	 * @return A list of Account record IDs that need to be processed.
+	 */
 	public List<Id> start(Database.BatchableContext bContext) {
 		List<Id> accountInOndatoWorklist = new List<Id>(new Map<Id, SObject>([
 				SELECT Id
@@ -39,7 +54,7 @@ public with sharing class OndatoMatchesImportBatch implements Schedulable, Datab
 	}
 
 	/**
-	 * Batch execute method to retrieve AML matches form the Ondato
+	 * @description Batch execute method to retrieve AML matches form the Ondato
 	 * system and create/update them on Salesforce.
 	 * It handles both Person Accounts and Business Accounts.
 	 *

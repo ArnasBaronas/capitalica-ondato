@@ -1,15 +1,37 @@
+/**
+ * @description Service class responsible for sending, deleting, and managing Account data
+ * and AML match reviews with the Ondato KYC/AML external service.
+ *
+ * @author <a href="mailto:arnasbaronas@gmail.com">Arnas Baronas</a>
+ */
 @SuppressWarnings('PMD.CyclomaticComplexity, PMD.CognitiveComplexity')
 public with sharing class OndatoService {
 
+	/** @description The ID of the Ondato worklist retrieved from custom settings */
 	public static final String WORKLIST_ID = Ondato_Settings__c.getInstance().Worklist_Id__c;
 
+	/**
+     * @description DTO representing the result of sending an Account to Ondato.
+     */
 	public class AccountSendResult {
+		/** @description Salesforce Account ID */
 		public Id salesforceId;
+		/** @description Ondato Account ID */
 		public String ondatoId;
+		/** @description Timestamp of when the account was exported */
 		public Datetime exportDateTime;
+		/** @description Indicates whether the send was successful */
 		public Boolean isSuccessful;
 	}
 
+	/**
+     * @description Sends an Account to Ondato by ID.
+     *
+     * @param accountId The Salesforce Account ID.
+     * @param performDML If true, updates the Account record.
+     * @param throwException If true, rethrows any caught exception.
+     * @return Result object containing operation outcome.
+     */
 	public static AccountSendResult sendAccount(Id accountId, Boolean performDML, Boolean throwException) {
 		Account account = [
 				SELECT
@@ -22,6 +44,14 @@ public with sharing class OndatoService {
 		return sendAccount(account, performDML, throwException);
 	}
 
+	/**
+     * @description Sends a specified Account to Ondato.
+     *
+     * @param account Account record to send.
+     * @param performDML If true, updates the Account record.
+     * @param throwException If true, rethrows any caught exception.
+     * @return Result object containing operation outcome.
+     */
 	@SuppressWarnings('PMD.NcssMethodCount, PMD.CyclomaticComplexity')
 	// In order to keep the code easy to read and avoid excessive fragmentation into helper methods,
 	// some cyclomatic complexity rules may be intentionally violated. This approach prioritizes clarity
@@ -97,13 +127,31 @@ public with sharing class OndatoService {
 		return result;
 	}
 
+	/**
+     * @description DTO representing the result of deleting an Account from Ondato.
+     */
 	public class AccountDeleteResult {
+		/** @description Salesforce Account ID */
 		public Id salesforceId;
+
+		/** @description Ondato Account ID */
 		public String ondatoId;
+
+		/** @description Timestamp of deletion */
 		public Datetime deleteDateTime;
+
+		/** @description Indicates whether the delete was successful */
 		public Boolean isSuccessful;
 	}
 
+	/**
+     * @description Deletes an Account from Ondato by ID.
+     *
+     * @param accountId The Salesforce Account ID.
+     * @param performDML If true, updates the Account record.
+     * @param throwException If true, rethrows any caught exception.
+     * @return Result object containing operation outcome.
+     */
 	public static AccountDeleteResult deleteAccount(Id accountId, Boolean performDML, Boolean throwException) {
 		Account account = [
 				SELECT
@@ -116,6 +164,14 @@ public with sharing class OndatoService {
 		return deleteAccount(account, performDML, throwException);
 	}
 
+	/**
+     * @description Deletes the given Account from Ondato.
+     *
+     * @param account Account record to delete.
+     * @param performDML If true, updates the Account record.
+     * @param throwException If true, rethrows any caught exception.
+     * @return Result object containing operation outcome.
+     */
 	@SuppressWarnings('PMD.NcssMethodCount, PMD.CyclomaticComplexity')
 	// In order to keep the code easy to read and avoid excessive fragmentation into helper methods,
 	// some cyclomatic complexity rules may be intentionally violated. This approach prioritizes clarity
@@ -139,9 +195,7 @@ public with sharing class OndatoService {
 
 			Logger.info('Request endpoint: ' + request.getEndpoint());
 
-			//TODO: validate status code
 			response = new Http().send(request);
-
 			if (String.valueOf(response.getStatusCode()).startsWith('2') == false) {
 				throw new CalloutException(response.getBody());
 			}
@@ -169,6 +223,14 @@ public with sharing class OndatoService {
 		return result;
 	}
 
+	/**
+     * @description Retrieves AML match records for the given Account ID.
+     *
+     * @param accountId Salesforce Account ID.
+     * @param performDML If true, persists match results.
+     * @param throwException If true, rethrows any caught exception.
+     * @return List of AML match records.
+     */
 	public static List<Ondato_AML_Match__c> getAmlMatches(Id accountId, Boolean performDML, Boolean throwException) {
 		Account account = [
 				SELECT
@@ -181,6 +243,14 @@ public with sharing class OndatoService {
 		return getAmlMatches(account, performDML, throwException);
 	}
 
+	/**
+     * @description Retrieves AML match records for a given Account.
+     *
+     * @param account The Account to retrieve matches for.
+     * @param performDML If true, saves match records.
+     * @param throwException If true, rethrows exceptions.
+     * @return List of AML match records.
+     */
 	@SuppressWarnings('PMD.NcssMethodCount, PMD.CyclomaticComplexity')
 	// In order to keep the code easy to read and avoid excessive fragmentation into helper methods,
 	// some cyclomatic complexity rules may be intentionally violated. This approach prioritizes clarity
@@ -210,7 +280,6 @@ public with sharing class OndatoService {
 			response = new Http().send(request);
 			if (String.valueOf(response.getStatusCode()).startsWith('2') == false) {
 				throw new CalloutException('HTTP - ' + response.getStatusCode() + '. Response: ' + response.getBody());
-
 			}
 			OndatoMatchModel.Response matchesResponse = (OndatoMatchModel.Response) JSON.deserialize(response.getBody(), OndatoMatchModel.Response.class);
 			for (OndatoMatchModel matchInResponse : matchesResponse.matches) {
@@ -237,19 +306,39 @@ public with sharing class OndatoService {
 		return matchRecords;
 	}
 
+	/**
+     * @description DTO representing the result of sending an AML match review to Ondato.
+     */
 	public class MatchReviewSendResult {
+		/** @description Review status sent to Ondato */
 		@AuraEnabled
 		public String status;
+
+		/** @description Salesforce Account ID */
 		@AuraEnabled
 		public Id salesforceAccountId;
+
+		/** @description Ondato Account ID */
 		@AuraEnabled
 		public String ondatoAccountId;
+
+		/** @description Salesforce AML Match ID */
 		@AuraEnabled
 		public Id salesforceMatchId;
+
+		/** @description Ondato Match ID */
 		@AuraEnabled
 		public String ondatoMatchId;
 	}
 
+	/**
+     * @description Sends a review decision for an AML match to Ondato.
+     *
+     * @param amlMatchId Salesforce AML match record ID.
+     * @param amlMatchReview Review payload to send.
+     * @param performDML If true, updates local match status.
+     * @return Result of the review operation.
+     */
 	@SuppressWarnings('PMD.NcssMethodCount')
 	// In order to keep the code easy to read and avoid excessive fragmentation into helper methods,
 	// some cyclomatic complexity rules may be intentionally violated. This approach prioritizes clarity
@@ -332,6 +421,12 @@ public with sharing class OndatoService {
 		return result;
 	}
 
+	/**
+     * @description Helper method to get the API path based on account type.
+     *
+     * @param account The Account being handled.
+     * @return API path segment for the account type.
+     */
 	private static String getEntityPath(Account account) {
 		if (account.IsPersonAccount) {
 			return '/natural-entity-records/';
