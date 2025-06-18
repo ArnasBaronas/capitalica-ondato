@@ -1,0 +1,6 @@
+{
+  "status": "True Positive",
+  "clientRiskRating": "High-Risk",
+  "clientComment": "Reviewed as true positive, no risk to the business",
+  "clientUserId": "john.doe"
+}
