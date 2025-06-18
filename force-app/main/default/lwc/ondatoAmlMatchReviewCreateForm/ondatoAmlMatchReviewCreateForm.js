@@ -9,14 +9,14 @@ import sendMatchReview from '@salesforce/apex/OndatoService.sendMatchReview';
 import USER_ID from '@salesforce/user/Id';
 import USER_NAME_FIELD from '@salesforce/schema/User.Name';
 import USER_EMAIL_FIELD from '@salesforce/schema/User.Email';
-import AML_MATCH_OBJECT from '@salesforce/schema/AML_Match__c';
-import AML_MATCH_STATUS_FIELD from '@salesforce/schema/AML_Match__c.Status__c';
-import AML_MATCH_SCORE_FIELD from '@salesforce/schema/AML_Match__c.Score__c';
+import AML_MATCH_OBJECT from '@salesforce/schema/Ondato_AML_Match__c';
+import AML_MATCH_STATUS_FIELD from '@salesforce/schema/Ondato_AML_Match__c.Status__c';
+import AML_MATCH_SCORE_FIELD from '@salesforce/schema/Ondato_AML_Match__c.Score__c';
 
 const USER_FIELDS = [USER_NAME_FIELD, USER_EMAIL_FIELD];
 const AML_MATCH_FIELDS = [AML_MATCH_STATUS_FIELD, AML_MATCH_SCORE_FIELD];
 
-export default class AmlMatchReviewCreateForm extends LightningElement {
+export default class OndatoAmlMatchReviewCreateForm extends LightningElement {
     @api recordId;
     @api objectApiName;
 
