@@ -9,6 +9,7 @@ private class OndatoService_Test {
 				Accounts_Delete_Batch_Size__c = 10,
 				Accounts_Export_Batch_Size__c = 10,
 				Matches_Import_Batch_Size__c = 10,
+				Create_History_Records__c = true,
 				Worklist_Id__c = 'WORKLIST_ID'
 		));
 		Database.insert(new Account(

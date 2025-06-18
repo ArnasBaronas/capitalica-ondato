@@ -1,7 +1,6 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="Project Default" />
-    <option name="myName" value="Project Default" />
     <inspection_tool class="PMDApex" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="pmdPath" value="/opt/homebrew/Cellar/pmd/7.2.0/bin" />
       <option name="rulesetPath" value="$USER_HOME$/Documents/ruleset.xml" />
