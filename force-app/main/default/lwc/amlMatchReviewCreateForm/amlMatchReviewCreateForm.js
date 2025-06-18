@@ -88,10 +88,10 @@ export default class AmlMatchReviewCreateForm extends LightningElement {
             amlMatchReview: this.amlMatchReview,
             performDML: false
         })
-            .then(matchStatus => {
+            .then(matchReviewSendResult => {
                 this.showToast('Success', 'Review created successfully', 'success');
                 return updateRecord({
-                    fields: { Id: this.recordId, Status__c: matchStatus }
+                    fields: { Id: this.recordId, Status__c: matchReviewSendResult.status }
                 });
             })
             .then(() => {

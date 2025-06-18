@@ -225,11 +225,20 @@ public with sharing class OndatoService {
 	}
 
 	public class MatchReviewSendResult {
-
+		@AuraEnabled
+		public String status;
+		@AuraEnabled
+		public Id salesforceAccountId;
+		@AuraEnabled
+		public String ondatoAccountId;
+		@AuraEnabled
+		public Id salesforceMatchId;
+		@AuraEnabled
+		public String ondatoMatchId;
 	}
 
 	@AuraEnabled(Cacheable=false)
-	public static String sendMatchReview(Id amlMatchId, OndatoAmlMatchReviewModel amlMatchReview, Boolean performDML) {
+	public static MatchReviewSendResult sendMatchReview(Id amlMatchId, OndatoAmlMatchReviewModel amlMatchReview, Boolean performDML) {
 		Exception caughtException;
 		HttpRequest request = new HttpRequest();
 		HttpResponse response;
@@ -296,7 +305,14 @@ public with sharing class OndatoService {
 			}
 		}
 		Logger.flushBuffer();
-		return amlMatchReview.status;
+		MatchReviewSendResult result = new MatchReviewSendResult();
+		result.status = amlMatchReview.status;
+		result.salesforceAccountId = amlMatch.Account__r.Id;
+		result.ondatoAccountId = amlMatch.Account__r.Ondato_Id__c;
+		result.salesforceMatchId = amlMatch.Id;
+		result.ondatoMatchId = amlMatch.Match_ID__c;
+
+		return result;
 	}
 
 	private static String getEntityPath(Account account) {
