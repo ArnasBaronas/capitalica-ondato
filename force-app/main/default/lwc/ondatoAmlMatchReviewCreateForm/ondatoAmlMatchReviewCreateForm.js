@@ -1,5 +1,5 @@
 import { LightningElement, api, track, wire } from 'lwc';
-import { getRecord, updateRecord } from 'lightning/uiRecordApi';
+import { getRecord, /*updateRecord,*/ notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 import { getPicklistValues, getObjectInfo } from 'lightning/uiObjectInfoApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { CloseActionScreenEvent } from 'lightning/actions';
@@ -86,9 +86,16 @@ export default class OndatoAmlMatchReviewCreateForm extends LightningElement {
         sendMatchReview({
             amlMatchId: this.recordId,
             amlMatchReview: this.amlMatchReview,
-            performDML: false
+            performDML: true
         })
-            .then(matchReviewSendResult => {
+            .then(async () => {
+                this.showToast('Success', 'Review created successfully', 'success');
+                await notifyRecordUpdateAvailable([{recordId: this.recordId}]);
+                this.closeForm();
+            })
+            // since field-level security was restricted for end-users,
+            // status update DML is performed in apex with system context
+            /*.then(matchReviewSendResult => {
                 this.showToast('Success', 'Review created successfully', 'success');
                 return updateRecord({
                     fields: { Id: this.recordId, Status__c: matchReviewSendResult.status }
@@ -96,7 +103,7 @@ export default class OndatoAmlMatchReviewCreateForm extends LightningElement {
             })
             .then(() => {
                 this.closeForm();
-            })
+            })*/
             .catch(error => {
                 this.showToast('Error', reduceErrors(error).join(', '), 'error');
                 console.error(error);
