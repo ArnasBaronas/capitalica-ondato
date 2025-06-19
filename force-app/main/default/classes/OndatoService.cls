@@ -4,7 +4,7 @@
  *
  * @author <a href="mailto:arnasbaronas@gmail.com">Arnas Baronas</a>
  */
-@SuppressWarnings('PMD.CyclomaticComplexity, PMD.CognitiveComplexity')
+@SuppressWarnings('PMD.CyclomaticComplexity, PMD.CognitiveComplexity, PMD.StdCyclomaticComplexity')
 public with sharing class OndatoService {
 
 	/** @description The ID of the Ondato worklist retrieved from custom settings */
@@ -52,7 +52,7 @@ public with sharing class OndatoService {
      * @param throwException If true, rethrows any caught exception.
      * @return Result object containing operation outcome.
      */
-	@SuppressWarnings('PMD.NcssMethodCount, PMD.CyclomaticComplexity')
+	@SuppressWarnings('PMD.NcssMethodCount, PMD.CyclomaticComplexity, PMD.StdCyclomaticComplexity')
 	// In order to keep the code easy to read and avoid excessive fragmentation into helper methods,
 	// some cyclomatic complexity rules may be intentionally violated. This approach prioritizes clarity
 	// over strict adherence to complexity metrics.
