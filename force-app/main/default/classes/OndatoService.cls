@@ -384,7 +384,7 @@ public with sharing class OndatoService {
 			}
 		} catch (Exception exc) {
 			caughtException = exc;
-
+			Logger.error('Error during or processing callout ', exc);
 			if (response != null) {
 				Logger.info('Response status code');
 				Logger.info(String.valueOf(response.getStatusCode()));
