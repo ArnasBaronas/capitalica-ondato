@@ -40,7 +40,7 @@ public with sharing class OndatoAmlMatchHistoryHandler {
 		List<Ondato_AML_Match_History__c> amlMatchHistories = new List<Ondato_AML_Match_History__c>();
 		for(Ondato_AML_Match__c amlMatch : amlMatches) {
 			Ondato_AML_Match_History__c matchHistory = new Ondato_AML_Match_History__c();
-			String operationName = (operation == TriggerOperation.AFTER_UPDATE) ? 'Update' : (operation == TriggerOperation.AFTER_INSERT) ? 'Insert' : 'Unknown';
+			String operationName = (operation == TriggerOperation.AFTER_UPDATE) ? 'Updated' : (operation == TriggerOperation.AFTER_INSERT) ? 'Created' : 'Unknown';
 			matchHistory.Operation__c = operationName;
 			matchHistory.AML_Match__c = amlMatch.Id;
 			matchHistory.Status__c = statusValueToLabelMap.get(amlMatch.Status__c);
