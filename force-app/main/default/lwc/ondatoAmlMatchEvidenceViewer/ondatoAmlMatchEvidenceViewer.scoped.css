@@ -4,6 +4,8 @@
     display: -webkit-box;
     white-space: normal;
     -webkit-box-orient: vertical;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .brandTextLink {
