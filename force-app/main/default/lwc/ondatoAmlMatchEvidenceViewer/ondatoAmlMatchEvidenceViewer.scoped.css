@@ -1,0 +1,35 @@
+.description-wrapper {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+}
+
+.brandTextLink {
+    color: var(--lwc-brandTextLink);
+    text-decoration: none;
+}
+
+.lineRow:hover .titleContainer {
+    text-decoration: underline;
+    transition: background-color 0.3s ease;
+}
+
+.lineRow:hover {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.spinner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}

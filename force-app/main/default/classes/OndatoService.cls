@@ -65,7 +65,7 @@ public with sharing class OndatoService {
 		try {
 			Logger.info('Sending "' + account.Name + '" account to Ondato', account.Id);
 
-			String baseEndpoint = 'callout:Ondato/v1/worklists/' + WORKLIST_ID + getEntityPath(account);
+			String baseEndpoint = 'callout:Ondato/v1/worklists/' + WORKLIST_ID + getEntityPath(account, PathType.RECORDS);
 			Boolean isNew = String.isBlank(account.Ondato_Id__c);
 
 			if (isNew) {
@@ -190,7 +190,7 @@ public with sharing class OndatoService {
 			}
 
 			request.setMethod('DELETE');
-			String baseEndpoint = 'callout:Ondato/v1/worklists/' + WORKLIST_ID + getEntityPath(account);
+			String baseEndpoint = 'callout:Ondato/v1/worklists/' + WORKLIST_ID + getEntityPath(account, PathType.RECORDS);
 			request.setEndpoint(baseEndpoint + account.Ondato_Id__c);
 
 			Logger.info('Request endpoint: ' + request.getEndpoint());
@@ -260,7 +260,7 @@ public with sharing class OndatoService {
 		HttpRequest request = new HttpRequest();
 		{
 			String endpoint = 'callout:Ondato/v1/worklists/' + WORKLIST_ID;
-			endpoint += getEntityPath(account);
+			endpoint += getEntityPath(account, PathType.RECORDS);
 			endpoint += account.Ondato_Id__c + '/search';
 			request.setEndpoint(endpoint);
 		}
@@ -367,7 +367,7 @@ public with sharing class OndatoService {
 
 			{
 				String endpoint = 'callout:Ondato/v1/worklists/' + WORKLIST_ID;
-				endpoint += getEntityPath(amlMatch.Account__r);
+				endpoint += getEntityPath(amlMatch.Account__r, PathType.RECORDS);
 				endpoint += amlMatch.Account__r.Ondato_Id__c + '/matches/';
 				endpoint += amlMatch.Match_ID__c + '/reviews';
 				request.setEndpoint(endpoint);
@@ -421,16 +421,105 @@ public with sharing class OndatoService {
 		return result;
 	}
 
-	/**
-     * @description Helper method to get the API path based on account type.
-     *
-     * @param account The Account being handled.
-     * @return API path segment for the account type.
-     */
-	private static String getEntityPath(Account account) {
-		if (account.IsPersonAccount) {
-			return '/natural-entity-records/';
+
+	public class EvidenceDetails {
+		@AuraEnabled
+		public String evidenceId;
+		@AuraEnabled
+		public List<String> dataSets;
+		@AuraEnabled
+		public String originalUrl;
+		@AuraEnabled
+		public String title;
+		@AuraEnabled
+		public String credibility;
+		@AuraEnabled
+		public String language;
+		@AuraEnabled
+		public String summary;
+		@AuraEnabled
+		public String keywords;
+		@AuraEnabled
+		public Date captureDateIso;
+		@AuraEnabled
+		public Date publicationDateIso;
+		@AuraEnabled
+		public String assetUrl;
+	}
+
+	@AuraEnabled(Cacheable=true)
+	public static List<EvidenceDetails> getMatchEvidences(Id amlMatchId) {
+		HttpRequest request = new HttpRequest();
+		HttpResponse response;
+		Ondato_AML_Match__c amlMatch;
+
+		try {
+			amlMatch = [
+					SELECT
+							Id, Match_ID__c,
+							Account__r.Id, Account__r.IsPersonAccount, Account__r.Ondato_Id__c
+					FROM Ondato_AML_Match__c
+					WHERE Id = :amlMatchId
+					WITH SECURITY_ENFORCED
+			];
+			Logger.info('Getting "' + amlMatch.Match_ID__c + '" AML match details from Ondato', amlMatchId);
+
+			request.setMethod('GET');
+			request.setHeader('Content-Type', 'application/json');
+			request.setBody('{}');
+
+			{
+				String endpoint = 'callout:Ondato/v1';
+				endpoint += getEntityPath(amlMatch.Account__r, PathType.DETAILS);
+				endpoint += amlMatch.Match_ID__c;
+				request.setEndpoint(endpoint);
+			}
+			Logger.info('Request endpoint');
+			Logger.info(request.getEndpoint());
+
+			response = new Http().send(request);
+			if (String.valueOf(response.getStatusCode()).startsWith('2') == false) {
+				throw new CalloutException('HTTP - ' + response.getStatusCode() + '. Response: ' + response.getBody());
+			}
+			EntityDetailsResponse entityDetailsResponse = (EntityDetailsResponse) JSON.deserialize(response.getBody(), EntityDetailsResponse.class);
+
+			return entityDetailsResponse.evidences;
+		} catch (Exception exc) {
+			Logger.error('Error during or processing callout ', exc);
+			if (response != null) {
+				Logger.info('Response status code');
+				Logger.info(String.valueOf(response.getStatusCode()));
+				Logger.info('Response body');
+				Logger.info(response?.getBody());
+				Logger.error('Error preparing or executing callout', exc);
+			}
+			Logger.saveLog();
+			throw exc;
 		}
-		return '/legal-entity-records/';
+	}
+
+	/**
+	 * @description Returns the appropriate API path segment based on the account type and requested path type.
+	 *
+	 * @param account The Account being processed.
+	 * @param path The type of API path (RECORDS or DETAILS).
+	 * @return Corresponding API path segment.
+	 * @throws HandledException if the path type is unsupported.
+	 */
+	private static String getEntityPath(Account account, PathType path) {
+		Boolean isPerson = account.IsPersonAccount;
+
+		if (path == PathType.RECORDS) {
+			return isPerson ? '/natural-entity-records/' : '/legal-entity-records/';
+		} else if (path == PathType.DETAILS) {
+			return isPerson ? '/natural-entity-details/' : '/legal-entity-details/';
+		}
+
+		throw new HandledException('Unhandled path type: ' + String.valueOf(path));
+	}
+
+	private enum PathType {
+		RECORDS,
+		DETAILS
 	}
 }
