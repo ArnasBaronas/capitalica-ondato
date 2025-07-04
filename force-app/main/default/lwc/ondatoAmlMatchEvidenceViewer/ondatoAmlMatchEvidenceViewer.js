@@ -96,7 +96,7 @@ export default class OndatoAmlMatchEvidenceViewer extends LightningElement {
                     };
                 });
 
-                // removing evidence if do not contain originalUrl
+                // removing evidences if they do not contain originalUrl
                 result = result.filter(item => item.originalUrl?.trim());
 
                 //sorting by credibility
@@ -108,7 +108,10 @@ export default class OndatoAmlMatchEvidenceViewer extends LightningElement {
                         ...item,
                         // adding fake title if it is blank
                         title: item.title?.trim() ? item.title : `Evidence #${index + 1}`,
-                        additionalPaddingInBottom: (index === result.length - 1) && !this.isEvidenceListExpandable
+                        additionalPaddingInBottom:
+                            (index === result.length - 1) &&
+                            !this.isEvidenceListExpandable &&
+                            !!item.summary?.trim()
                     };
                 });
 
