@@ -17,6 +17,8 @@ const CREDIBILITY_SORT_ORDER = {
 
 export default class OndatoAmlMatchEvidenceViewer extends LightningElement {
 
+    //TODO: add title trunking if it does not fit in one line
+
     connectedCallback() {
         this.loadEvidences();
     }

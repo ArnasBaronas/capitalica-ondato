@@ -13,6 +13,16 @@
     text-decoration: none;
 }
 
+.titleContainer {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
 .lineRow:hover .titleContainer {
     text-decoration: underline;
     transition: background-color 0.3s ease;
