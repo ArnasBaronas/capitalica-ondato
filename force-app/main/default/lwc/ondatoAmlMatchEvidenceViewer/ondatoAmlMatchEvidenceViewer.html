@@ -89,34 +89,39 @@
                                                     </template>
                                                 </div>
                                             </div>
-                                            <div class="description-wrapper slds-p-horizontal_x-small" style={clampStyling}>
+                                            <div class="description-wrapper slds-p-horizontal_x-small"
+                                                 style={clampStyling}>
                                                 {evidence.summary}
                                             </div>
-
+                                            <template lwc:if={evidence.additionalPaddingInBottom}>
+                                                <div class="slds-p-bottom_x-small"></div>
+                                            </template>
                                         </td>
                                     </tr>
                                 </template>
-                                <template if:true={isEvidenceListExpanded}>
-                                    <tr onclick={showLessEvidences}>
-                                        <td class="lineRow">
-                                            <div class="slds-p-around_x-small">
-                                                <div class="brandTextLink titleContainer slds-align_absolute-center">
-                                                    Show Less Evidences
+                                <template lwc:if={isEvidenceListExpandable}>
+                                    <template if:true={isEvidenceListExpanded}>
+                                        <tr onclick={showLessEvidences}>
+                                            <td class="lineRow">
+                                                <div class="slds-p-around_x-small">
+                                                    <div class="brandTextLink titleContainer slds-align_absolute-center">
+                                                        Show Less Evidences
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </template>
-                                <template if:false={isEvidenceListExpanded}>
-                                    <tr onclick={handleViewAllClick} style={viewAllLinkStyle}>
-                                        <td class="lineRow" >
-                                            <div class="slds-p-around_x-small">
-                                                <div class="brandTextLink titleContainer slds-align_absolute-center">
-                                                    View All Evidences
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <template if:false={isEvidenceListExpanded}>
+                                        <tr onclick={viewAllEvidences}>
+                                            <td class="lineRow">
+                                                <div class="slds-p-around_x-small">
+                                                    <div class="brandTextLink titleContainer slds-align_absolute-center">
+                                                        View All Evidences
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                            </td>
+                                        </tr>
+                                    </template>
                                 </template>
                             </template>
                             </tbody>

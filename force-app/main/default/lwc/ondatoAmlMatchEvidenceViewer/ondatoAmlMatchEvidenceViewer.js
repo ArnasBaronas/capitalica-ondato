@@ -17,7 +17,6 @@ const CREDIBILITY_SORT_ORDER = {
 
 export default class OndatoAmlMatchEvidenceViewer extends LightningElement {
 
-    //TODO: fix all evidences disable feature
     //TODO: change worklist Id field into resource Id
     //TODO: fix width bug on expansion https://capitalica--partial.sandbox.lightning.force.com/lightning/r/Ondato_AML_Match__c/a0FJW000008afjX2AQ/view
 
@@ -110,6 +109,7 @@ export default class OndatoAmlMatchEvidenceViewer extends LightningElement {
                         ...item,
                         // adding fake title if it is blank
                         title: item.title?.trim() ? item.title : `Evidence #${index + 1}`,
+                        additionalPaddingInBottom: (index === result.length - 1) && !this.isEvidenceListExpandable
                     };
                 });
 
@@ -138,20 +138,8 @@ export default class OndatoAmlMatchEvidenceViewer extends LightningElement {
         }
     }
 
-    get isViewAllDisabled() {
-        return this.recordsToDisplay >= this.evidencesCount;
-    }
-
-    get viewAllLinkStyle() {
-        return this.isViewAllDisabled ? 'cursor: not-allowed; pointer-events: none; opacity: 0.6;' : '';
-    }
-
-    handleViewAllClick() {
-        if (this.isViewAllDisabled) {
-            //event.preventDefault();
-            return;
-        }
-        this.viewAllEvidences();
+    get isEvidenceListExpandable() {
+        return this.recordsToDisplay <= this.evidencesCount;
     }
 
     viewAllEvidences() {
