@@ -290,4 +290,56 @@ private class OndatoService_Test {
 		Assert.areEqual(1, [SELECT Id FROM Log__c].size(), 'Log should be created');
 		Assert.areEqual(0, [SELECT Id FROM Ondato_AML_Match__c WHERE Status__c = 'Invalid'].size(), 'AML match status was updated');
 	}
+
+	@IsTest
+	@SuppressWarnings('PMD.MethodNamingConventions') // method name after underscore represents test scenario
+	static void getMatchEvidences_success() {
+		Ondato_AML_Match__c amlMatch = new Ondato_AML_Match__c(
+				Name = '001',
+				Match_ID__c = '001',
+				Match_Name__c = 'Test Tester',
+				Status__c = 'Open',
+				Account__c = [SELECT Id FROM Account].Id
+		);
+		Database.insert(amlMatch);
+
+		StaticResourceCalloutMock mock = new StaticResourceCalloutMock();
+		mock.setStaticResource('ondato_match_details_mock');
+		mock.setStatusCode(200);
+		Test.setMock(HttpCalloutMock.class, mock);
+		Test.startTest();
+		List<OndatoService.EvidenceDetails> evidences = OndatoService.getMatchEvidences(amlMatch.Id);
+
+		Test.stopTest();
+
+		Assert.areEqual(0, [SELECT Id FROM Log__c].size(), 'Log should not be created');
+		Assert.areEqual(1, evidences.size(), '1 evidences should be returned');
+	}
+
+	@IsTest
+	@SuppressWarnings('PMD.MethodNamingConventions') // method name after underscore represents test scenario
+	static void getMatchEvidences_calloutFailure() {
+		Ondato_AML_Match__c amlMatch = new Ondato_AML_Match__c(
+				Name = '001',
+				Match_ID__c = '001',
+				Match_Name__c = 'Test Tester',
+				Status__c = 'Open',
+				Account__c = [SELECT Id FROM Account].Id
+		);
+		Database.insert(amlMatch);
+
+		Boolean exceptionThrown = false;
+		Test.setMock(HttpCalloutMock.class, new CalloutTestUtility.SingleHttpMock(500, '{ "message": "everything went wrong :(" }'));
+		Test.startTest();
+		try {
+			OndatoService.getMatchEvidences(amlMatch.Id);
+		}
+		catch (CalloutException exc) {
+			exceptionThrown = true;
+		}
+		Test.stopTest();
+
+		Assert.isTrue(exceptionThrown, 'An exception must be thrown.');
+		Assert.areEqual(1, [SELECT Id FROM Log__c].size(), 'Log should be created');
+	}
 }

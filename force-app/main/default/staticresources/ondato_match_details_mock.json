@@ -1,0 +1,244 @@
+{
+  "resourceId": "1f5a940e6a16d390bfe45655c3176f64c5b123880ff08e04b61ad7325af76cc4",
+  "fullName": "John Jack Doe",
+  "firstName": "John",
+  "middleName": "Jack",
+  "lastName": "Doe",
+  "gender": "Male",
+  "isDeleted": false,
+  "deletionReason": {
+    "reason": "GovernmentPositionOutOfScope",
+    "otherReason": "Should not have been there in the first place."
+  },
+  "isDeceased": false,
+  "aliases": [
+    {
+      "fullName": "Jon Jack Doe",
+      "firstName": "Jon",
+      "middleName": "Jack",
+      "lastName": "Doe",
+      "type": "OriginalScriptName"
+    }
+  ],
+  "datesOfBirthIso": [
+    "1959-06-13",
+    "1960"
+  ],
+  "datesOfDeathsIso": [
+    "1999"
+  ],
+  "nationalitiesIsoCodes": [
+    "US",
+    "BG"
+  ],
+  "addresses": [
+    {
+      "addressType": "PlaceOfBirth",
+      "line1": "1 Main Street",
+      "line2": "Jameson House",
+      "postcode": "12345",
+      "city": "Paris",
+      "county": "Countyville",
+      "countryIsoCode": "FR"
+    }
+  ],
+  "profileImages": [
+    "https://ec.europa.eu/commission/commissioners/sites/default/files/styles/biography_portrait_160x160/public/commissioner_portraits/ursula-von-der-leyen.jpg",
+    "https://ec.europa.eu/commission/commissioners/sites/default/files/styles/members_responsive_custom_user_min_width_480px_1x/public/commissioner_portraits/frans-timmermans_0.jpg?itok=e5cXFQsm"
+  ],
+  "notes": [
+    {
+      "value": "Example text"
+    }
+  ],
+  "contactEntries": [
+    {
+      "category": "Telephone",
+      "value": "example@examle.com"
+    }
+  ],
+  "identifiers": [
+    {
+      "category": "NPI Number",
+      "value": "12345"
+    }
+  ],
+  "evidences": [
+    {
+      "dataSets": [
+        "ExternalPepCurrent",
+        "ExternalSanctionsFormer"
+      ],
+      "evidenceId": "12345678",
+      "title": "Example Arrested for Money Laundering",
+      "credibility": "Low",
+      "language": "eng",
+      "summary": "Snippet....",
+      "keywords": "Money Laundering, AML",
+      "publicationDateIso": "2020-01-11",
+      "assetUrl": "",
+      "originalUrl": "https://www.example.com"
+    }
+  ],
+  "sanctionEntries": {
+    "current": [
+      {
+        "sanctionId": "124122",
+        "measures": [
+          "Travel Ban"
+        ],
+        "regime": {
+          "body": "United Nations Security Council (UNSC)",
+          "name": "Iranian Sanctions List",
+          "origin": "United Nations",
+          "types": [
+            "Territorial Violation",
+            "Human Rights"
+          ]
+        },
+        "events": [
+          {
+            "type": "Added",
+            "evidenceIds": [
+              "12422"
+            ]
+          }
+        ]
+      }
+    ],
+    "former": [
+      {
+        "sanctionId": "124122",
+        "measures": [
+          "Travel Ban"
+        ],
+        "regime": {
+          "body": "United Nations Security Council (UNSC)",
+          "name": "Iranian Sanctions List",
+          "origin": "United Nations",
+          "types": [
+            "Territorial Violation",
+            "Human Rights"
+          ]
+        },
+        "events": [
+          {
+            "type": "Added",
+            "evidenceIds": [
+              "12422"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "regulatoryEnforcementListEntries": [
+    {
+      "category": "Law Enforcement",
+      "subCategory": "Police - Avon and Somerset Police - Wanted In Court - United Kingdom",
+      "events": [
+        {
+          "type": "Arrest",
+          "currencyCode": "USD",
+          "amount": 1000,
+          "period": {
+            "days": 5,
+            "years": 1,
+            "months": 3
+          },
+          "evidenceIds": [
+            "354363"
+          ]
+        }
+      ]
+    }
+  ],
+  "adverseMediaEntries": [
+    {
+      "category": "Cybercrime",
+      "subCategory": "Identity Theft",
+      "events": [
+        {
+          "type": "Court Proceedings in Progress: Remand",
+          "evidenceIds": [
+            "542622"
+          ]
+        }
+      ]
+    }
+  ],
+  "pepEntries": {
+    "pepTier": "PEPTier2",
+    "current": [
+      {
+        "countryIsoCode": "GB",
+        "segment": "Executive Branch - Head and Members of Government and Deputies",
+        "position": "Prime Minister (Kryeministër) | Council of Ministers (Këshilli i Ministrave)",
+        "dateFromIso": "2019",
+        "dateToIso": "2030-03-03",
+        "evidenceIds": 362233
+      }
+    ],
+    "former": [
+      {
+        "countryIsoCode": "GB",
+        "segment": "Executive Branch - Head and Members of Government and Deputies",
+        "position": "Prime Minister (Kryeministër) | Council of Ministers (Këshilli i Ministrave)",
+        "dateFromIso": "2019",
+        "dateToIso": "2030-03-03",
+        "evidenceIds": 362233
+      }
+    ]
+  },
+  "pepByAssociationEntries": [
+    {
+      "resourceId": "14cd74d2421d222cc4eba069a482f114f26246d1493eb098d22992b83f679fe4",
+      "evidenceIds": [
+        "12345"
+      ]
+    }
+  ],
+  "individualLinks": [
+    {
+      "firstName": "Jason",
+      "middleName": "Christopher",
+      "lastName": "Daniel",
+      "relationship": "John Doe is the brother of Jason Christopher Daniel.",
+      "ownershipPercentage": 75,
+      "resourceId": "14cd74d2421d222cc4eba069a482f114f26246d1493eb098d22992b83f679fe4",
+      "datasets": [
+        "ExternalSanctionsCurrent",
+        "ExternalAdverseMedia"
+      ]
+    }
+  ],
+  "businessLinks": [
+    {
+      "name": "IM Systems Limited",
+      "resourceId": "2d21438f6da5b12ad44baf1ef0ee8ae320ff53ec8e0346a3bf0e1bf96ed07ff8",
+      "relationship": "john Doe is a board member of IM Systems Limited",
+      "ownershipPercentage": 75,
+      "datasets": [
+        "ExternalSanctionsCurrent"
+      ],
+      "individualLinks": [
+        {
+          "firstName": "Jason",
+          "middleName": "Christopher",
+          "lastName": "Daniel",
+          "relationship": "John Doe is the brother of Jason Christopher Daniel.",
+          "ownershipPercentage": 75,
+          "resourceId": "14cd74d2421d222cc4eba069a482f114f26246d1493eb098d22992b83f679fe4",
+          "datasets": [
+            "ExternalSanctionsCurrent",
+            "ExternalAdverseMedia"
+          ]
+        }
+      ]
+    }
+  ],
+  "dataSets": [
+    "ExternalPepCurrent",
+    "OndatoPepCurrent"
+  ]
+}
