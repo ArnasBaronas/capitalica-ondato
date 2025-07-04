@@ -7,9 +7,9 @@ import getMatchEvidences from '@salesforce/apex/OndatoService.getMatchEvidences'
 const LIST_TITLE = 'Evidences';
 
 const CREDIBILITY_SORT_ORDER = {
-    'high': 1,
-    'medium': 2,
-    'low': 3,
+    'High': 1,
+    'Medium': 2,
+    'Low': 3,
     '': 4,
     null: 4,
     undefined: 4
@@ -18,9 +18,9 @@ const CREDIBILITY_SORT_ORDER = {
 export default class OndatoAmlMatchEvidenceViewer extends LightningElement {
 
     //TODO: write unit tests
-    //TODO: disable view all if all evidences are already shown
-    //TODO: add border around component, so it would look as standard component in card
+    //TODO: fix all evidences disable feature
     //TODO: change worklist Id field into resource Id
+    //TODO: fix width bug on expansion https://capitalica--partial.sandbox.lightning.force.com/lightning/r/Ondato_AML_Match__c/a0FJW000008afjX2AQ/view
 
     connectedCallback() {
         this.loadEvidences();
@@ -137,6 +137,22 @@ export default class OndatoAmlMatchEvidenceViewer extends LightningElement {
         } else {
             this.showToast('Warning', 'Evidence source not found', 'warning');
         }
+    }
+
+    get isViewAllDisabled() {
+        return this.recordsToDisplay >= this.evidencesCount;
+    }
+
+    get viewAllLinkStyle() {
+        return this.isViewAllDisabled ? 'cursor: not-allowed; pointer-events: none; opacity: 0.6;' : '';
+    }
+
+    handleViewAllClick() {
+        if (this.isViewAllDisabled) {
+            //event.preventDefault();
+            return;
+        }
+        this.viewAllEvidences();
     }
 
     viewAllEvidences() {
