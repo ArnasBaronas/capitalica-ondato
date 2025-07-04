@@ -108,8 +108,8 @@
                                     </tr>
                                 </template>
                                 <template if:false={isEvidenceListExpanded}>
-                                    <tr onclick={viewAllEvidences}>
-                                        <td class="lineRow">
+                                    <tr onclick={handleViewAllClick} style={viewAllLinkStyle}>
+                                        <td class="lineRow" >
                                             <div class="slds-p-around_x-small">
                                                 <div class="brandTextLink titleContainer slds-align_absolute-center">
                                                     View All Evidences
