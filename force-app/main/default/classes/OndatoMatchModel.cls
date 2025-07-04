@@ -60,7 +60,7 @@ public with sharing class OndatoMatchModel {
 		amlMatch.Name = matchId;
 		amlMatch.Match_ID__c = matchId;
 		amlMatch.Profile_Image__c = profileImage;
-		amlMatch.Worklist_Id__c = resourceId;
+		amlMatch.Resource_Id__c = resourceId;
 		amlMatch.Account__c = accountId;
 		amlMatch.Score__c = score;
 		amlMatch.Source_List__c = String.join(dataSets ??  new List<String>(), ';\n');

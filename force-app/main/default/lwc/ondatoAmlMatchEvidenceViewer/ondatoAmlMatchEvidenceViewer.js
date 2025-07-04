@@ -17,7 +17,6 @@ const CREDIBILITY_SORT_ORDER = {
 
 export default class OndatoAmlMatchEvidenceViewer extends LightningElement {
 
-    //TODO: change worklist Id field into resource Id
     //TODO: fix width bug on expansion https://capitalica--partial.sandbox.lightning.force.com/lightning/r/Ondato_AML_Match__c/a0FJW000008afjX2AQ/view
 
     connectedCallback() {

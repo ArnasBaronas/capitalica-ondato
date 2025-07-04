@@ -22,6 +22,19 @@ private class OndatoService_Test {
 		));
 	}
 
+	static Ondato_AML_Match__c createAmlMatch() {
+		Ondato_AML_Match__c amlMatch = new Ondato_AML_Match__c(
+				Name = '001',
+				Match_ID__c = '001',
+				Match_Name__c = 'Test Tester',
+				Status__c = 'Open',
+				Account__c = [SELECT Id FROM Account].Id,
+				Resource_Id__c = '001'
+		);
+		Database.insert(amlMatch);
+		return amlMatch;
+	}
+
 	@IsTest
 	@SuppressWarnings('PMD.MethodNamingConventions') // method name after underscore represents test scenario
 	static void sendAccount_newNaturalEntitySuccess() {
@@ -193,14 +206,7 @@ private class OndatoService_Test {
 	@IsTest
 	@SuppressWarnings('PMD.MethodNamingConventions') // method name after underscore represents test scenario
 	static void sendMatchReview_success() {
-		Ondato_AML_Match__c amlMatch = new Ondato_AML_Match__c(
-				Name = '001',
-				Match_ID__c = '001',
-				Match_Name__c = 'Test Tester',
-				Status__c = 'Open',
-				Account__c = [SELECT Id FROM Account].Id
-		);
-		Database.insert(amlMatch);
+		Ondato_AML_Match__c amlMatch = createAmlMatch();
 
 		OndatoAmlMatchReviewModel reviewModel = new OndatoAmlMatchReviewModel();
 		reviewModel.status = 'TruePositive';
@@ -223,14 +229,7 @@ private class OndatoService_Test {
 	@IsTest
 	@SuppressWarnings('PMD.MethodNamingConventions') // method name after underscore represents test scenario
 	static void sendMatchReview_calloutFailure() {
-		Ondato_AML_Match__c amlMatch = new Ondato_AML_Match__c(
-				Name = '001',
-				Match_ID__c = '001',
-				Match_Name__c = 'Test Tester',
-				Status__c = 'Open',
-				Account__c = [SELECT Id FROM Account].Id
-		);
-		Database.insert(amlMatch);
+		Ondato_AML_Match__c amlMatch = createAmlMatch();
 
 		OndatoAmlMatchReviewModel reviewModel = new OndatoAmlMatchReviewModel();
 		reviewModel.status = 'FalsePositive';
@@ -257,14 +256,7 @@ private class OndatoService_Test {
 	@IsTest
 	@SuppressWarnings('PMD.MethodNamingConventions') // method name after underscore represents test scenario
 	static void sendMatchReview_dmlFailure() {
-		Ondato_AML_Match__c amlMatch = new Ondato_AML_Match__c(
-				Name = '001',
-				Match_ID__c = '001',
-				Match_Name__c = 'Test Tester',
-				Status__c = 'Open',
-				Account__c = [SELECT Id FROM Account].Id
-		);
-		Database.insert(amlMatch);
+		Ondato_AML_Match__c amlMatch = createAmlMatch();
 
 		OndatoAmlMatchReviewModel reviewModel = new OndatoAmlMatchReviewModel();
 		reviewModel.status = 'Invalid';
@@ -294,14 +286,7 @@ private class OndatoService_Test {
 	@IsTest
 	@SuppressWarnings('PMD.MethodNamingConventions') // method name after underscore represents test scenario
 	static void getMatchEvidences_success() {
-		Ondato_AML_Match__c amlMatch = new Ondato_AML_Match__c(
-				Name = '001',
-				Match_ID__c = '001',
-				Match_Name__c = 'Test Tester',
-				Status__c = 'Open',
-				Account__c = [SELECT Id FROM Account].Id
-		);
-		Database.insert(amlMatch);
+		Ondato_AML_Match__c amlMatch = createAmlMatch();
 
 		StaticResourceCalloutMock mock = new StaticResourceCalloutMock();
 		mock.setStaticResource('ondato_match_details_mock');
@@ -319,14 +304,7 @@ private class OndatoService_Test {
 	@IsTest
 	@SuppressWarnings('PMD.MethodNamingConventions') // method name after underscore represents test scenario
 	static void getMatchEvidences_calloutFailure() {
-		Ondato_AML_Match__c amlMatch = new Ondato_AML_Match__c(
-				Name = '001',
-				Match_ID__c = '001',
-				Match_Name__c = 'Test Tester',
-				Status__c = 'Open',
-				Account__c = [SELECT Id FROM Account].Id
-		);
-		Database.insert(amlMatch);
+		Ondato_AML_Match__c amlMatch = createAmlMatch();
 
 		Boolean exceptionThrown = false;
 		Test.setMock(HttpCalloutMock.class, new CalloutTestUtility.SingleHttpMock(500, '{ "message": "everything went wrong :(" }'));
