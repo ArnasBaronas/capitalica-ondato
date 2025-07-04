@@ -6,13 +6,21 @@ import getMatchEvidences from '@salesforce/apex/OndatoService.getMatchEvidences'
 
 const LIST_TITLE = 'Evidences';
 
+const CREDIBILITY_SORT_ORDER = {
+    'high': 1,
+    'medium': 2,
+    'low': 3,
+    '': 4,
+    null: 4,
+    undefined: 4
+};
+
 export default class OndatoAmlMatchEvidenceViewer extends LightningElement {
 
     //TODO: write unit tests
     //TODO: disable view all if all evidences are already shown
     //TODO: add border around component, so it would look as standard component in card
     //TODO: change worklist Id field into resource Id
-    //TODO: sort evidences by credibility
 
     connectedCallback() {
         this.loadEvidences();
@@ -81,11 +89,28 @@ export default class OndatoAmlMatchEvidenceViewer extends LightningElement {
             .then(result => {
                 this.isEvidenceListExpanded = false;
                 this.evidencesCount = result?.length;
+                result = result.map((item) => {
+                    return {
+                        ...item,
+                        // modifying credibility value
+                        credibility: item.credibility ? `${String(item.credibility).charAt(0).toUpperCase() + String(item.credibility).slice(1)} Credibility` : null,
+                        // for sorting by credibility
+                        _credibilitySortKey: CREDIBILITY_SORT_ORDER[item.credibility] ?? 4
+                    };
+                });
+
+                // removing evidence if do not contain originalUrl
+                result = result.filter(item => item.originalUrl?.trim());
+
+                //sorting by credibility
+                result.sort((a, b) => a._credibilitySortKey - b._credibilitySortKey);
+                result.forEach(item => delete item._credibilitySortKey);
+
                 result = result.map((item, index) => {
                     return {
                         ...item,
+                        // adding fake title if it is blank
                         title: item.title?.trim() ? item.title : `Evidence #${index + 1}`,
-                        credibility: item.credibility ? `${String(item.credibility).charAt(0).toUpperCase() + String(item.credibility).slice(1)} Credibility` : null
                     };
                 });
 
@@ -98,7 +123,7 @@ export default class OndatoAmlMatchEvidenceViewer extends LightningElement {
             .catch(error => {
                 this.showSpinner = false;
                 this.hasError = true;
-                this.showToast('Error', reduceErrors(error).join(', '), 'error');
+                this.showToast('Error', `Error while getting evidences: '${reduceErrors(error).join(', ')}`, 'error');
             });
     }
 
