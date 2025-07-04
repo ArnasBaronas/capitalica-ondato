@@ -9,7 +9,7 @@
                     <div class="slds-media__figure">
                         <span class="slds-icon_container">
                             <lightning-icon
-                                    icon-name="standard:note"
+                                    icon-name="standard:record_lookup"
                                     alternative-text={cardTitle}
                                     title={cardTitle}
                                     size="small"
@@ -19,7 +19,7 @@
                     <div class="slds-media__body">
                         <div class="slds-page-header__name">
                             <h2 class="slds-card__header-title">
-                                <a onclick={viewAllActivities} class="slds-card__header-link slds-truncate"
+                                <a onclick={viewAllEvidences} class="slds-card__header-link slds-truncate"
                                    title={cardTitle}>
                                     <span>{cardTitle}</span>
                                 </a>
@@ -65,29 +65,44 @@
                                 <template for:each={evidences} for:item="evidence">
                                     <tr key={evidence.evidenceId}
                                         data-evidence-id={evidence.evidenceId}
-                                        onclick={openEvidence}>
+                                        onclick={openEvidenceSource}>
+                                        <td class="lineRow">
+                                            <div class="slds-grid slds-grid_vertical-align-center slds-p-around_x-small">
+                                                <div class="slds-col">
+                                                    <div class="brandTextLink titleContainer">
+                                                        <b>{evidence.title}</b>
+                                                    </div>
+                                                    <template lwc:if={evidence.publicationDateIso}>
+                                                        <i><span>published on </span>
+                                                            <lightning-formatted-date-time
+                                                                    year="numeric"
+                                                                    month="2-digit"
+                                                                    day="2-digit"
+                                                                    value={evidence.publicationDateIso}>
+                                                            </lightning-formatted-date-time>
+                                                        </i>
+                                                    </template>
+                                                </div>
+                                                <div class="slds-col slds-text-align_right">
+                                                    <template lwc:if={evidence.credibility}>
+                                                        <lightning-badge label={evidence.credibility}></lightning-badge>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                            <div class="description-wrapper slds-p-horizontal_x-small" style={clampStyling}>
+                                                {evidence.summary}
+                                            </div>
+
+                                        </td>
+                                    </tr>
+                                </template>
+                                <template if:true={isEvidenceListExpanded}>
+                                    <tr onclick={showLessEvidences}>
                                         <td class="lineRow">
                                             <div class="slds-p-around_x-small">
-                                                <div class="brandTextLink titleContainer">
-                                                    {evidence.title}
+                                                <div class="brandTextLink titleContainer slds-align_absolute-center">
+                                                    Show Less Evidences
                                                 </div>
-                                                <i><a href={evidence.originalUrl} target="_blank">Source</a> (
-                                                    <lightning-formatted-date-time
-                                                            year="numeric"
-                                                            month="2-digit"
-                                                            day="2-digit"
-                                                            value={evidence.publicationDateIso}>
-                                                    </lightning-formatted-date-time>
-                                                    )
-                                                </i>
-                                            </div>
-                                            <div>
-                                                <template lwc:if={evidence.credibility}>
-                                                    <lightning-badge label={evidence.credibility}></lightning-badge>
-                                                </template>
-                                            </div>
-                                            <div class="description-wrapper" style={clampStyling}>
-                                                {evidence.summary}
                                             </div>
                                         </td>
                                     </tr>

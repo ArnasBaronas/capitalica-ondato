@@ -456,7 +456,7 @@ public with sharing class OndatoService {
 		try {
 			amlMatch = [
 					SELECT
-							Id, Match_ID__c,
+							Id, Match_ID__c, Worklist_Id__c,
 							Account__r.Id, Account__r.IsPersonAccount, Account__r.Ondato_Id__c
 					FROM Ondato_AML_Match__c
 					WHERE Id = :amlMatchId
@@ -471,7 +471,7 @@ public with sharing class OndatoService {
 			{
 				String endpoint = 'callout:Ondato/v1';
 				endpoint += getEntityPath(amlMatch.Account__r, PathType.DETAILS);
-				endpoint += amlMatch.Match_ID__c;
+				endpoint += amlMatch.Worklist_Id__c;
 				request.setEndpoint(endpoint);
 			}
 			Logger.info('Request endpoint');

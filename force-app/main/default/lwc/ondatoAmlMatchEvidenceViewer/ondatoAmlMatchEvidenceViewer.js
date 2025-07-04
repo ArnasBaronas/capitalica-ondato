@@ -1,17 +1,18 @@
 import {api, LightningElement, track} from 'lwc';
-import {ShowToastEvent} from "lightning/platformShowToastEvent";
+import {ShowToastEvent} from 'lightning/platformShowToastEvent';
 import { reduceErrors } from 'c/ldsUtils';
 
 import getMatchEvidences from '@salesforce/apex/OndatoService.getMatchEvidences';
 
+const LIST_TITLE = 'Evidences';
+
 export default class OndatoAmlMatchEvidenceViewer extends LightningElement {
 
-    //TODO: hide blank Source
-    //TODO: hide blank Publication Date
-    //TODO: hide blank summary
-    //TODO: hide blank credibility
-    //TODO: change card icon
-    //TODO: add component icon
+    //TODO: write unit tests
+    //TODO: disable view all if all evidences are already shown
+    //TODO: add border around component, so it would look as standard component in card
+    //TODO: change worklist Id field into resource Id
+    //TODO: sort evidences by credibility
 
     connectedCallback() {
         this.loadEvidences();
@@ -20,8 +21,7 @@ export default class OndatoAmlMatchEvidenceViewer extends LightningElement {
     @api
     recordId;
 
-    @api
-    listTitle = 'Evidences';
+    listTitle = LIST_TITLE;
 
     @api
     recordsToDisplay;
@@ -102,9 +102,26 @@ export default class OndatoAmlMatchEvidenceViewer extends LightningElement {
             });
     }
 
+    openEvidenceSource(event) {
+        const evidenceId = event.currentTarget.dataset.evidenceId;
+        const matchedEvidence = this.evidences.find(
+            evidence => evidence.evidenceId === evidenceId
+        );
+        if (matchedEvidence?.originalUrl) {
+            window.open(matchedEvidence.originalUrl, '_blank');
+        } else {
+            this.showToast('Warning', 'Evidence source not found', 'warning');
+        }
+    }
+
     viewAllEvidences() {
         this.isEvidenceListExpanded = true;
-        this.evidences = this.evidencesAll;
+        this.evidences = [...this.evidencesAll];
+    }
+
+    showLessEvidences() {
+        this.isEvidenceListExpanded = false;
+        this.evidences.splice(this.recordsToDisplay);
     }
 
     refreshView() {
