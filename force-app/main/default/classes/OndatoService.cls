@@ -422,31 +422,63 @@ public with sharing class OndatoService {
 	}
 
 
+	/**
+	 * @description DTO representing a single piece of evidence associated with an AML match.
+	 */
 	public class EvidenceDetails {
+
+		/** @description Unique identifier of the evidence. */
 		@AuraEnabled
 		public String evidenceId;
+
+		/** @description List of datasets from which the evidence is derived. */
 		@AuraEnabled
 		public List<String> dataSets;
+
+		/** @description Original source URL of the evidence. */
 		@AuraEnabled
 		public String originalUrl;
+
+		/** @description Title or headline of the evidence content. */
 		@AuraEnabled
 		public String title;
+
+		/** @description Credibility assessment provided by the source or Ondato. */
 		@AuraEnabled
 		public String credibility;
+
+		/** @description Language of the evidence content. */
 		@AuraEnabled
 		public String language;
+
+		/** @description Summary or description of the evidence content. */
 		@AuraEnabled
 		public String summary;
+
+		/** @description Keywords extracted or associated with the evidence. */
 		@AuraEnabled
 		public String keywords;
+
+		/** @description Date when the evidence was captured, in ISO format. */
 		@AuraEnabled
 		public Date captureDateIso;
+
+		/** @description Publication date of the evidence, in ISO format. */
 		@AuraEnabled
 		public Date publicationDateIso;
+
+		/** @description URL to any asset associated with the evidence (e.g., image, document). */
 		@AuraEnabled
 		public String assetUrl;
 	}
 
+	/**
+	 * @description Retrieves a list of evidences associated with a specific AML match.
+	 *
+	 * @param amlMatchId The Salesforce ID of the AML match record.
+	 * @return A list of evidence details returned by Ondato.
+	 * @throws Exception if the request fails or the response is invalid.
+	 */
 	@AuraEnabled(Cacheable=true)
 	public static List<EvidenceDetails> getMatchEvidences(Id amlMatchId) {
 		HttpRequest request = new HttpRequest();

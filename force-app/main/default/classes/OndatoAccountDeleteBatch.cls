@@ -5,8 +5,8 @@
  *
  * Batch size is controlled by a custom setting `Ondato_Settings__c.Accounts_Delete_Batch_Size__c`.
  *
-* @author <a href="mailto:arnasbaronas@gmail.com">Arnas Baronas</a>
-*/
+ * @author <a href="mailto:arnasbaronas@gmail.com">Arnas Baronas</a>
+ */
 public with sharing class OndatoAccountDeleteBatch implements Schedulable, Database.Batchable<Id>, Database.AllowsCallouts {
 
 	/** @description Executes the batch job immediately. */
