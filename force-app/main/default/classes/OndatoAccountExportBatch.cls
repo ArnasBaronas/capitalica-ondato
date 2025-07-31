@@ -14,7 +14,7 @@ public with sharing class OndatoAccountExportBatch implements Schedulable, Datab
 
 	/** @description Predefined investor stages considered required for screening. */
 	static final List<String> INVESTOR_STAGES = new List<String>{
-			'Active_Investing', 'Onboarding'
+			'Active_Investing'
 	};
 
 	/**
