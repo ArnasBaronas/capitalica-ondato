@@ -7,9 +7,14 @@
  */
 public with sharing class OndatoAccountExportBatch implements Schedulable, Database.Batchable<Id>, Database.AllowsCallouts {
 
-	/** @description Predefined relationship roles considered closely related to active investors. */
+	/** @description Predefined relationship roles considered closely related to active/onboarding investors. */
 	static final List<String> CLOSELY_RELATED_ROLES = new List<String>{
-			'Spouse', 'Authorised Representative', 'Executive', 'Authorised Representative', 'Beneficiary'
+			'Spouse', 'Authorised Representative', 'Executive', 'Beneficiary'
+	};
+
+	/** @description Predefined investor stages considered required for screening. */
+	static final List<String> INVESTOR_STAGES = new List<String>{
+			'Active_Investing', 'Onboarding'
 	};
 
 	/**
@@ -22,7 +27,7 @@ public with sharing class OndatoAccountExportBatch implements Schedulable, Datab
 		List<Id> directInvestors = new List<Id>(new Map<Id, SObject>([
 				SELECT Id
 				FROM Account
-				WHERE Stage__c = 'Active_Investing'
+				WHERE Stage__c IN :INVESTOR_STAGES
 				WITH SECURITY_ENFORCED
 		]).keySet());
 
@@ -35,7 +40,7 @@ public with sharing class OndatoAccountExportBatch implements Schedulable, Datab
 						FROM AccountContactRelation
 						WHERE
 								Roles IN :CLOSELY_RELATED_ROLES AND
-								Account.Stage__c = 'Active_Investing'
+								Account.Stage__c = :INVESTOR_STAGES
 				)
 				WITH SECURITY_ENFORCED
 		]).keySet());
